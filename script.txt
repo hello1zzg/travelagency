@@ -1,0 +1,170 @@
+#总体流程
+##1.在nacos上面创建一个服务
+curl -X POST '10.77.70.184:8848/nacos/v1/ns/service?serviceName=2022104167loan&groupName=WORKFLOW&protectThreshold=0'
+
+curl -X POST '10.77.70.184:8848/nacos/v1/ns/service?serviceName=2023000923loan&groupName=WORKFLOW&protectThreshold=0'
+
+##2.把loan_service运行的flask实例化到上面创建的服务
+curl -X POST 'http://10.77.70.184:8848/nacos/v1/ns/instance?port=2024&healthy=true&ip=10.9.34.66&weight=1.0&serviceName=2022104167loan&groupName=WORKFLOW&encoding=GBK'
+删除多余的实例(用学校VPN每次ip会变，需要把旧的实例删除)
+curl -X DELETE 'http://10.77.70.184:8848/nacos/v1/ns/instance?port=2024&ip=10.9.32.221&serviceName=2022104167loan&groupName=WORKFLOW'
+
+##3.把bpmn图部署到服务器
+python3 deploy.py --BpmnPath=./bpmn/2022104167loan.bpmn  --deploymentName=2022104167loan.bpmn
+
+##4.把部署好的bpmn图实例化（每次执行前都需要重新实例化获取新的oid）
+实例化的时候processData和businessData可以提交空的，.table文件照着第二次实验写anyone就行
+python3 instance.py --allocationTablePath=./table/2022104167loan.bpmn.table --deploymentName=2022104167loan.bpmn --processDataPath=./data/processData.txt --businessDataPath=./data/instanceData.txt
+
+##5.执行本地前端flask程序
+
+
+#数据流
+##login&submit
+get {userId, loanEXP}
+output {"userId":userId, "loanEXP":loanEXP}    loanEXP:期望贷款金额
+
+##bank_query
+input {"userId":"init.userId", "loanEXP":"init.loanEXP"}
+output {
+        "bank":[
+            {"bankId":0, "d_rate":d_rate0, "b_quota":b_quota0},     d_rate:对应银行的打折后利率, b_quota:对应银行的贷款额度
+            {"bankId":1, "d_rate":d_rate1, "b_quota":b_quota1},
+            {"bankId":2, "d_rate":d_rate2, "b_quota":b_quota2}
+        ],
+        "salary":salary
+        }
+
+##fund_query
+input {"userId":"init.userId", "loanEXP":"init.loanEXP"}
+output {"f_rate":f_rate, "f_quota":f_quota}
+
+##loan_rec
+input {
+        "userId":"init.userId",
+        "loanEXP":"init.loanEXP", 
+        "f_rate":"fund_query.f_rate", 
+        "f_quota":"fund_query.f_quota",
+        "bankId":"bank_query.bank.bankId",
+        "d_rate":"bank_query.bank.d_rate",
+        "b_quota":"bank_query.bank.b_quota",
+        "salary":"bank_query.salary"
+        }
+output {
+        "userId":userId,
+        "loan_type":loan_type,      推荐时默认计算等额本息
+        "bank":{
+            "bankId":bankId,
+            "b_amount":b_amount,      b_amount:在银行贷款的金额
+            "d_rate":d_rate
+        },
+        "fund":{
+            "f_amount":f_amount,
+            "f_rate":f_rate
+        }，
+        "term":term,
+        "monthly_pay":monthly_pay,
+        "total_pay":total_pay，
+        "f_rate":f_rate, 
+        "f_quota":f_quota,
+        "bankId":bankId,
+        "d_rate":d_rate,
+        "b_quota":b_quota
+        }
+
+####################上阶段的service task数据到此终止，init数据刷新
+##submit_loan_plan
+get {loan_rec的全部output}
+output {
+        "userId":userId,
+        "loan_type":loan_type,
+        "bank":{
+            "bankId":bankId,
+            "b_amount":b_amount,
+            "d_rate":d_rate,
+            "b_monthly_pay":b_monthly_pay,
+            "b_total_pay":b_total_pay
+        },
+        "fund":{
+            "f_amount":f_amount,
+            "f_rate":f_rate,
+            "f_monthly_pay":f_monthly_pay,
+            "f_total_pay":f_total_pay
+        }，
+        "repay_type":repay_type,           repay_type:等额本息/等额本金
+        "term":term,
+        "monthly_pay":monthly_pay,         monthly_pay:等额本息则每期还款，等额本金则首期还款
+        "total_pay":total_pay
+        }
+
+##credit_query
+input {"userId":"init.userId"}
+output {"credit":credit}                   此处还需输出processData
+
+##judge_bank_loan
+input {"loan_type":"init.loan_type"}
+output {}                                  output为空，但需输出processData
+
+##judge_fund_loan
+input {"loan_type":"init.loan_type"}
+output {}                                  output为空，但需输出processData
+
+##store_bank_loan
+input {
+        "userId":"init.userId",
+        "bankId":"init.bank.bankId",
+        "b_amount":"init.bank.b_amount",
+        "d_rate":"init.bank.d_rate",
+        "b_monthly_pay":"init.bank.b_monthly_pay",
+        "b_total_pay":"init.bank.b_total_pay",
+        "repay_type":"init.repay_type",
+        "term":"init.term"
+       }
+output {}     output为空，但需把input存数据库
+
+##store_fund_loan
+input {
+        "userId":"init.userId",
+        "f_amount":"init.fund.f_amount",
+        "f_rate":"init.fund.f_rate",
+        "f_monthly_pay":"init.fund.f_monthly_pay",
+        "f_total_pay":"init.fund.f_total_pay",
+        "repay_type":"init.repay_type",
+        "term":"init.term"
+       }
+output {}     output为空，但需把input存数据库
+
+##bank_auto_judge
+input {
+        "bankId":"init.bank.bankId",
+        "b_amount":"init.bank.b_amount",
+        "b_monthly_pay":"init.bank.b_monthly_pay",
+      }
+output {}     output为空，但需把自动判断的结果存数据库
+
+##fund_auto_judge
+input {
+        "f_amount":"init.fund.f_amount"
+      }
+output {}     output为空，但需把自动判断的结果存数据库
+
+##bank_judge
+get {}        直接从数据库读还没审批的申请
+output {"b_judge_res":b_judge_res}     需把人工判断的结果存数据库
+
+##fund_judge
+get {}        直接从数据库读还没审批的申请
+output {"f_judge_res":f_judge_res}     需把人工判断的结果存数据库
+
+##judge_merge
+input {
+        "b_judge_res":"bank_judge.b_judge_res",
+        "f_judge_res":"fund_judge.f_judge_res"
+       }
+output {
+        "b_judge_res":b_judge_res,
+        "f_judge_res":f_judge_res
+       }
+
+##loan_res_confirm
+get {b_judge_res, f_judge_res}

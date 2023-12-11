@@ -1,0 +1,88 @@
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <title>确认贷款计划</title>
+      <style>
+         .button-group {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+         }
+         .btn-primary {
+            color: white;
+            background-color: rgb(0, 85, 255);
+         }
+         .btn-secondary {
+            color: white;
+            background-color: grey;
+         }
+       </style>       
+   </head>
+   <body>
+      <h2 style = "text-align: center;">您的贷款计划明细</h2>
+      <table border = "1" cellpadding="3" cellspacing="0" style="width: 60%;margin:auto">
+         <tr>
+            <th> 贷款类型 </th>
+            {% if loan_type == 1 %}
+               <td style="text-align:center;vertical-align:middle;">公积金贷款</td>
+            {% elif loan_type == 2 %}
+               <td style="text-align:center;vertical-align:middle;">混合贷款</td>
+            {% else %}
+               <td style="text-align:center;vertical-align:middle;">商业贷款</td>
+            {% endif %}
+         </tr>
+         <tr>
+            <th> 贷款总额 </th>
+            <td style="text-align:center;vertical-align:middle;"> {{ "%.2f" | format(total_amount / 10000) }}万元</td>
+         </tr>
+         <tr>
+            <th> 还款类型 </th>
+            {% if repay_type == 1 %}
+               <td style="text-align:center;vertical-align:middle;">等额本息</td>
+            {% elif repay_type == 2 %}
+               <td style="text-align:center;vertical-align:middle;">等额本金</td>
+            {% endif %}
+         </tr>
+         <tr>
+            <th> 还款总额 </th>
+            <td style="text-align:center;vertical-align:middle;"> {{ "%.2f" | format(total_pay / 10000) }}万元</td>
+         </tr>
+         <tr>
+            <th> 支付利息 </th>
+            <td style="text-align:center;vertical-align:middle;"> {{ "%.2f" | format((total_pay - total_amount) / 10000) }}万元</td>
+         </tr>
+         <tr>
+            <th> 还款年数 </th>
+            <td style="text-align:center;vertical-align:middle;"> {{ term }}年</td>
+         </tr>
+         <tr>
+            {% if repay_type == 1 %}
+               <th>每月还款</th>
+            {% elif repay_type == 2 %}
+               <th>首月还款</th>
+            {% endif %}
+            <td style="text-align:center;vertical-align:middle;"> {{ "%.2f" | format(monthly_pay) }}元</td>
+         </tr>
+         <tr>
+            <th> 每月递减 </th>
+            <td style="text-align:center;vertical-align:middle;"> {{ "%.2f" | format(monthly_decrement) }}元</td>
+         </tr>
+      </table>
+
+      <!-- <form action = "/choose_loan_plan" method = "post">
+         <p><button type="submit" style="width: 12%;height: 7%; margin-left:29%">返回重选</button></p>
+      </form>
+      <form action = "/submit_loan_plan" method = "post">
+         <p><button type="submit" style="width: 12%;height: 7%; margin-left:59%">提交申请</button></p>
+      </form> -->
+      <div class="button-group">
+         <button onclick="window.location.href='/choose_loan_plan'" 
+            style="width: 12%;height: 17%; margin-top: 3%;" class="btn btn-secondary">返回重选
+         </button>
+         <button onclick="window.location.href='/submit_loan_plan'" 
+            style="width: 12%;height: 17%; margin-top: 3%;" class="btn btn-primary">提交申请
+         </button>
+      </div>
+
+   </body>
+</html>

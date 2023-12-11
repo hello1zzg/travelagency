@@ -1,0 +1,151 @@
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <title>选择贷款计划</title>
+      <style>
+         /* h2 {
+           text-align: center;
+           font-size: 2em;
+           color: #333;
+         }
+         h3 {
+           font-size: 1.5em;
+           color: #666;
+         }
+         p {
+           font-size: 1em;
+           color: #999;
+         } */
+         fieldset {
+            text-align: center;
+         }
+         form {
+            width: 50%; /* 表单宽度 */
+            margin: 0 auto; /* 居中对齐 */
+         }
+       </style>
+   </head>
+   <body>
+      <h2 style = "text-align: center;">贷款计划</h2>
+      <h3>欢迎使用贷款系统，根据您的期望贷款金额{{ "%.2f" | format(loanEXP / 10000) }}万元，给您如下贷款建议：</h3>
+      {% if loan_rec_dict.loan_type_rec == -1 %}
+         <h3>您的月收入为{{ loan_rec_dict.salary }}元，低于该期望贷款的最低月供{{ loan_rec_dict.min_monthly_pay }}元，建议您降低贷款期望～</h3>
+      {% elif loan_rec_dict.loan_type_rec == 0 %}
+         <h3>您的银行贷款和公积金贷款合计最高额度为{{ "%.2f" | format(loan_rec_dict.total_quota / 10000) }}万元，低于该期望贷款金额，建议您降低贷款期望～</h3>
+      {% elif loan_rec_dict.loan_type_rec == 1 %}
+         <h3>推荐您采用公积金贷款，贷款{{ "%.2f" | format(loanEXP / 10000) }}万元，
+            贷款利率{{ "%.2f" | format(loan_rec_dict.f_rate_rec * 100) }}%，
+            贷款{{ loan_rec_dict.term_rec }}年，等额本息还款，月供{{ loan_rec_dict.monthly_pay_rec }}元，
+            总还款{{ "%.2f" | format(loan_rec_dict.total_pay_rec / 10000) }}万元～
+         </h3>
+      {% elif loan_rec_dict.loan_type_rec == 2 %}
+         <h3>推荐您采用混合贷款，其中公积金贷款{{ "%.2f" | format(loan_rec_dict.f_amount_rec / 10000) }}万元，
+            贷款利率{{ "%.2f" | format(loan_rec_dict.f_rate_rec * 100) }}%，
+            商业贷款银行选择
+            {% if loan_rec_dict.bankId_rec == 1 %}
+               中国银行，
+            {% elif loan_rec_dict.bankId_rec == 2 %}
+               工商银行，
+            {% elif loan_rec_dict.bankId_rec == 3 %}
+               建设银行，
+            {% endif %}
+            商业贷款{{ "%.2f" | format(loan_rec_dict.b_amount_rec / 10000) }}万元，
+            贷款利率{{ "%.2f" | format(loan_rec_dict.d_rate_rec * 100) }}%，
+            贷款{{ loan_rec_dict.term_rec }}年，等额本息还款，月供{{ loan_rec_dict.monthly_pay_rec }}元，
+            总还款{{ "%.2f" | format(loan_rec_dict.total_pay_rec / 10000) }}万元～
+         </h3>
+      {% elif loan_rec_dict.loan_type_rec == 3 %}
+         <h3>推荐您采用商业贷款，商业贷款银行选择
+            {% if loan_rec_dict.bankId_rec == 1 %}
+               中国银行，
+            {% elif loan_rec_dict.bankId_rec == 2 %}
+               工商银行，
+            {% elif loan_rec_dict.bankId_rec == 3 %}
+               建设银行，
+            {% endif %}
+            贷款{{ "%.2f" | format(loan_rec_dict.b_amount_rec / 10000) }}万元，
+            贷款利率{{ "%.2f" | format(loan_rec_dict.d_rate_rec * 100) }}%，
+            贷款{{ loan_rec_dict.term_rec }}年，等额本息还款，月供{{ loan_rec_dict.monthly_pay_rec }}元，
+            总还款{{ "%.2f" | format(loan_rec_dict.total_pay_rec / 10000) }}万元～
+         </h3>
+      {% endif %}
+      <!-- {% if form.errors %}
+         {{ form.errors }}
+      {% endif %} -->
+
+      <!-- {% for message in get_flashed_messages() %}
+         {% if message %}
+            {{message}}
+         {% endif %}
+      {% endfor %} -->
+     
+      <form action = "http://localhost:2023/choose_loan_plan" method = post>
+         <fieldset>
+            <legend>请选择贷款计划</legend>
+            {{ form.hidden_tag() }}
+            
+            <!-- <div style ="font-size:20px;font-weight:bold;margin-left:150px;"> -->
+            <div class="form-group" style ="font-weight:bold;">
+               <div onchange="showinfo(this[selectedIndex].value)">
+                  {{ form.loan_type.label }} {{ form.loan_type }}
+                  <!-- {% for msg in form.loan_type.errors %}
+                     <p>{{ msg }}</p>
+                  {% endfor %} -->
+               </div>
+               <div>
+                  {{ form.repay_type.label }}<br>
+                  {{ form.repay_type }}
+                  <br>
+               </div>
+               <div>
+                  {{ form.term.label }}<br>
+                  {{ form.term }}
+                  <br>
+               </div>
+               <div id="f_amount">
+                  {{ form.f_amount.label }}<br>
+                  {{ form.f_amount(value=0) }}
+                  <br>
+                  <!-- {% for msg in form.f_amount.errors %}
+                     <p>{{ msg }}</p>
+                  {% endfor %} -->
+               </div>
+
+               <div id="b_amount">
+                  {{ form.bankId.label }}<br>
+                  {{ form.bankId }}
+                  <br>
+
+                  {{ form.b_amount.label }}<br>
+                  {{ form.b_amount(value=0) }}
+                  <br>
+                  <!-- {% for msg in form.b_amount.errors %}
+                     <p>{{ msg }}</p>
+                  {% endfor %} -->
+               </div>
+
+               <script type="text/javascript">
+                  function showinfo(value){
+                  if(value==1){
+                  $("#f_amount").css("display","block");
+                  $("#b_amount").css("display","none");
+                  }
+                  if(value==2){
+                  $("#f_amount").css("display","block");
+                  $("#b_amount").css("display","block");
+                  }
+                  if(value==3){
+                  $("#f_amount").css("display","none");
+                  $("#b_amount").css("display","block");
+                  }
+                  }
+               </script>
+               
+               <br>{{ form.submit }}<br>
+            </div>
+            
+         </fieldset>
+      </form>
+      
+   </body>
+</html>

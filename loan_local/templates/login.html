@@ -1,0 +1,85 @@
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Agency Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+			background-image: url('/static/background.png'); 
+			background-size: cover; /* 覆盖整个屏幕 */
+			background-position: center; /* 居中显示 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .loginBox {
+            width: 400px;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333; /* Dark text for better visibility */
+        }
+
+        .item {
+            margin-bottom: 20px;
+        }
+
+        .item input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff; /* Bright blue button */
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loginBox">
+        <h2>Travel Agency Login</h2>
+        <form action="http://localhost:2023/login" method="post">
+            <div class="item">
+                <input type="text" name="nm" required placeholder="Username">
+            </div>
+            <div class="item">
+                <input type="password" name="pd" required placeholder="Password">
+            </div>
+            <button type="submit" class="btn">Login</button>
+        </form>
+    </div>
+</body>
+
+</html>
