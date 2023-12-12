@@ -23,33 +23,48 @@ def index():
 def login():
     name = request.form.get("nm")
     password = request.form.get("pd")
-    # print(name, password)
-    mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'root', password= '12138', db= 'loan')
 
-    sql1 = "SELECT id, password FROM User WHERE name = '%s'"%(name)
-    try:
-        with mysql_conn.cursor() as cursor:
-            cursor.execute(sql1)
-            User_data = cursor.fetchone()
-            # print(User_data)
-    except Exception as e:
-        print(e)
-
-    mysql_conn.close()
-
-    if User_data == None:
+    headers = {'Content-Type': 'application/json'}
+    map = {}
+    map["name"] = name
+    map["password"] = password
+    datajson = json.dumps(map)
+    r=rq.Request(url="http://10.43.29.9:2024/login",data=bytes(datajson, "utf-8"),headers=headers)
+    result = rq.urlopen(r).read().decode('utf-8')
+    if result == "用户不存在":
         return "用户不存在"
-    elif password == User_data[1]:
-        if name == 'bankadmin1' or name == 'bankadmin2' or name == 'bankadmin3':
-            session["bankadmin"] = name
-            return redirect(url_for('bank_manual_judge'))
-        elif name == 'fundadmin':
-            return redirect(url_for('fund_manual_judge'))
-        session["userId"] = User_data[0]
-        session['name'] = name
+    elif result == "密码正确":
+        session["name"] = name
         return redirect(url_for('get_services'))
-    else:
+    elif result == "密码错误":
         return "密码错误"
+    # # print(name, password)
+    # mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'root', password= '12138', db= 'loan')
+
+    # sql1 = "SELECT id, password FROM User WHERE name = '%s'"%(name)
+    # try:
+    #     with mysql_conn.cursor() as cursor:
+    #         cursor.execute(sql1)
+    #         User_data = cursor.fetchone()
+    #         # print(User_data)
+    # except Exception as e:
+    #     print(e)
+
+    # mysql_conn.close()
+
+    # if User_data == None:
+    #     return "用户不存在"
+    # elif password == User_data[1]:
+    #     if name == 'bankadmin1' or name == 'bankadmin2' or name == 'bankadmin3':
+    #         session["bankadmin"] = name
+    #         return redirect(url_for('bank_manual_judge'))
+    #     elif name == 'fundadmin':
+    #         return redirect(url_for('fund_manual_judge'))
+    #     session["userId"] = User_data[0]
+    #     session['name'] = name
+    #     return redirect(url_for('get_services'))
+    # else:
+    #     return "密码错误"
 
 
 @app.route('/get_services',methods = ['POST', 'GET'])

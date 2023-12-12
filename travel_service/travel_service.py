@@ -7,7 +7,44 @@ import pandas as pd
 app = Flask(__name__)
 
 
-@app.route('/bank_query',methods = ['POST', 'GET'])
+@app.route('/login', methods = ['POST', 'GET'])
+def login():
+    datajsonstr = request.get_data()
+    input = json.loads(datajsonstr)
+    name = input["name"]
+    password = input["password"]
+    # print(name, password)
+
+    print(datajsonstr)
+
+    mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'ysm', password= 'yangshiming', db= 'ysm_tourism')
+
+    sql1 = "SELECT user_id, password FROM User WHERE user_name = '%s'"%(name)
+    try:
+        with mysql_conn.cursor() as cursor:
+            cursor.execute(sql1)
+            User_data = cursor.fetchone()
+            print(User_data)
+    except Exception as e:
+        print(e)
+
+    mysql_conn.close()
+
+    if User_data == None:
+        return "用户不存在"
+    elif password == User_data[1]:
+        # if name == 'bankadmin1' or name == 'bankadmin2' or name == 'bankadmin3':
+        #     # session["bankadmin"] = name
+        #     return redirect(url_for('bank_manual_judge'))
+        # elif name == 'fundadmin':
+        #     return redirect(url_for('fund_manual_judge'))
+        # session["userId"] = User_data[0]
+        # session['name'] = name
+        return "密码正确"
+    else:
+        return "密码错误"
+
+@app.route('/bank_query', methods = ['POST', 'GET'])
 def bank_query():
 
     '''
