@@ -1,9 +1,11 @@
+from decimal import Decimal
 from flask import Flask, redirect, url_for, request, render_template
 import pymysql
 from urllib import request as rq
 import json ,time, math
 import pandas as pd
-
+from datetime import date
+    
 app = Flask(__name__)
 
 
@@ -43,6 +45,51 @@ def login():
         return "密码正确"
     else:
         return "密码错误"
+
+
+# datatime转换为json
+class DateEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, date):
+            return obj.isoformat()
+        elif isinstance(obj, Decimal):
+            return float(obj)
+        return super().default(obj)
+
+@app.route('/ticket_query', methods = ['POST', 'GET'])
+def ticket_query():
+    datajson = request.get_data()
+    print(datajson)
+    input = json.loads(datajson)
+
+    departure_city = input["departure_city"]
+    arrival_city = input["arrival_city"]
+    departure_time = input["departure_time"]
+    preference_flight = input["preference_flight"]
+
+    mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'ysm', password= 'yangshiming', db= 'ysm_tourism')
+    if preference_flight == "" :
+        sql = "select flight_id, departure_city, arrival_city, departure_time, price, company_name from FlightInfo, Company where FlightInfo.company_id = Company.company_id and departure_city = '%s' and arrival_city = '%s' and departure_time = '%s'"%(departure_city, arrival_city, departure_time)
+    else:
+        sql = "select flight_id, departure_city, arrival_city, departure_time, price, company_name from FlightInfo, Company where FlightInfo.company_id = Company.company_id and departure_city = '%s' and arrival_city = '%s' and departure_time = '%s' and company_name = '%s'"%(departure_city, arrival_city, departure_time, preference_flight)
+
+    # print(sql)
+    try:
+        with mysql_conn.cursor() as cursor:
+            cursor.execute(sql)
+            User_data = cursor.fetchall()
+            print("User Data: ")
+            print(User_data)
+            columns = [col[0] for col in cursor.description]
+            result = []
+            print(columns)
+            for row in User_data:
+                result.append(dict(zip(columns, row)))
+            return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
+    except Exception as e:
+        print(e)
+    mysql_conn.close()
+        
 
 @app.route('/bank_query', methods = ['POST', 'GET'])
 def bank_query():
