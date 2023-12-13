@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>旅游代理服务网页</title>
+    <style>
+        body {
+            background-image: url('/static/background.png');
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .travel-form {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="travel-form">
+        <form id="travel-info-form">
+            <div class="form-group">
+                <label for="departure-date">选择出行日期:</label>
+                <input type="date" id="departure-date" name="departure_date">
+            </div>
+            <div class="form-group">
+                <label for="departure-city">出发城市:</label>
+                <input type="text" id="departure-city" name="departure_city">
+            </div>
+            <div class="form-group">
+                <label for="arrival-city">到达城市:</label>
+                <input type="text" id="arrival-city" name="arrival_city">
+            </div>
+            <div class="form-group">
+                <label>是否需要租车:</label>
+                <select id="need-car" name="need_car" onchange="toggleCarOptions(this)">
+                    <option value="no">不需要</option>
+                    <option value="yes">需要</option>
+                </select>
+            </div>
+            <div id="car-options" class="hidden">
+                <div class="form-group">
+                    <label for="car-type">选择车型:</label>
+                    <select id="car-type" name="car_type">
+                        <option value="微型车">微型车</option>
+                        <option value="小型车">小型车</option>
+                        <option value="紧凑型车">紧凑型车</option>
+                        <option value="中型车">中型车</option>
+                        <option value="中大型车">中大型车</option>
+                        <option value="大型车">大型车</option>
+                        <option value="SUV">SUV</option>
+                        <option value="MPV">MPV</option>
+                        <option value="跑车">跑车</option>
+                        <option value="皮卡">皮卡</option>
+                        <option value="微面">微面</option>
+                        <option value="轻客">轻客</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="gear-type">挡位:</label>
+                    <select id="gear-type" name="gear_type">
+                        <option value="manual">手动挡</option>
+                        <option value="automatic">自动挡</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="guide">是否需要导游陪同:</label>
+                <select id="guide" name="guide">
+                    <option value="full">全程陪同</option>
+                    <option value="partial">部分陪同</option>
+                    <option value="none">不需要陪同</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="preference">旅游偏好:</label>
+                <select id="preference" name="preference">
+                    <option value="rating">好评优先</option>
+                    <option value="price">低价优先</option>
+                </select>
+            </div>
+            <button type="submit" class="button">提交旅游信息</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleCarOptions(select) {
+            var carOptions = document.getElementById('car-options');
+            if (select.value === 'yes') {
+                carOptions.classList.remove('hidden');
+            } else {
+                carOptions.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
