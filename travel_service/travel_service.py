@@ -8,7 +8,7 @@ from datetime import date
     
 app = Flask(__name__)
 
-
+# login
 @app.route('/login', methods = ['POST', 'GET'])
 def login():
     datajsonstr = request.get_data()
@@ -56,30 +56,28 @@ class DateEncoder(json.JSONEncoder):
             return float(obj)
         return super().default(obj)
 
+# ticket query
 @app.route('/ticket_query', methods = ['POST', 'GET'])
 def ticket_query():
     datajson = request.get_data()
-    print(datajson)
+    # print(datajson)
     input = json.loads(datajson)
 
     departure_city = input["departure_city"]
     arrival_city = input["arrival_city"]
-    departure_time = input["departure_time"]
-    preference_flight = input["preference_flight"]
-
+    departure_time = input["departure_date"]
+    preference = input["preference"]
     mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'ysm', password= 'yangshiming', db= 'ysm_tourism')
-    if preference_flight == "" :
-        sql = "select flight_id, departure_city, arrival_city, departure_time, price, company_name from FlightInfo, Company where FlightInfo.company_id = Company.company_id and departure_city = '%s' and arrival_city = '%s' and departure_time = '%s'"%(departure_city, arrival_city, departure_time)
+    if preference == "price" :
+        sql = "select flight_id, departure_city, arrival_city, departure_time, price, company_name from FlightInfo, Company where FlightInfo.company_id = Company.company_id and departure_city = '%s' and arrival_city = '%s' and departure_time = '%s' order by price"%(departure_city, arrival_city, departure_time)
     else:
-        sql = "select flight_id, departure_city, arrival_city, departure_time, price, company_name from FlightInfo, Company where FlightInfo.company_id = Company.company_id and departure_city = '%s' and arrival_city = '%s' and departure_time = '%s' and company_name = '%s'"%(departure_city, arrival_city, departure_time, preference_flight)
+        sql = "select flight_id, departure_city, arrival_city, departure_time, price, company_name from FlightInfo, Company where FlightInfo.company_id = Company.company_id and departure_city = '%s' and arrival_city = '%s' and departure_time = '%s' order by rating desc"%(departure_city, arrival_city, departure_time)
 
-    # print(sql)
+    print(sql)
     try:
         with mysql_conn.cursor() as cursor:
             cursor.execute(sql)
             User_data = cursor.fetchall()
-            print("User Data: ")
-            print(User_data)
             columns = [col[0] for col in cursor.description]
             result = []
             print(columns)
@@ -90,6 +88,128 @@ def ticket_query():
         print(e)
     mysql_conn.close()
         
+
+# hotel query
+@app.route('/hotel_query', methods = ['POST', 'GET'])
+def hotel_query():
+    datajson = request.get_data()
+    # print(datajson)
+    input = json.loads(datajson)
+    
+    arrival_city = input["arrival_city"]
+    preference = input["preference"]
+    mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'ysm', password= 'yangshiming', db= 'ysm_tourism')
+    if preference == "price" :
+        sql = "select room_id, room_number, room_type, room_price, rating, hotel_name from Hotel, RoomInfo where Hotel.hotel_id = RoomInfo.hotel_id and city = '%s' order by price"%(arrival_city)
+    else:
+        sql = "select room_id, room_number, room_type, room_price, rating, hotel_name from Hotel, RoomInfo where Hotel.hotel_id = RoomInfo.hotel_id and city = '%s' order by rating desc"%(arrival_city)
+
+    # print(sql)
+    try:
+        with mysql_conn.cursor() as cursor:
+            cursor.execute(sql)
+            User_data = cursor.fetchall()
+            columns = [col[0] for col in cursor.description]
+            result = []
+            print(columns)
+            for row in User_data:
+                result.append(dict(zip(columns, row)))
+            return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
+    except Exception as e:
+        print(e)
+    mysql_conn.close()
+
+# car_rental query
+@app.route('/car_rental_query', methods = ['POST', 'GET'])
+def car_rental_query():
+    datajson = request.get_data()
+    # print(datajson)
+    input = json.loads(datajson)
+    
+    need_car = input["need_car"]
+    car_type = input["car_type"]
+    gear_type = input["gear_type"]
+    arrival_city = input["arrival_city"]
+    preference = input["preference"]
+    if need_car != "no":
+        mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'ysm', password= 'yangshiming', db= 'ysm_tourism')
+        if preference == "price" :
+            sql = "select carrental_id, car_type, transmission_type, rental_location, return_location, price, rating, company_name from CarRental, Company where CarRental.company_id = Company.company_id and car_type = '%s' and transmission_type = '%s' and rental_location = '%s' and return_location = '%s' order by price"%(car_type, gear_type, arrival_city, arrival_city)
+        else:
+            sql = "select carrental_id, car_type, transmission_type, rental_location, return_location, price, rating, company_name from CarRental, Company where CarRental.company_id = Company.company_id and car_type = '%s' and transmission_type = '%s' and rental_location = '%s' and return_location = '%s' order by rating desc"%(car_type, gear_type, arrival_city, arrival_city)
+        print(sql)
+        try:
+            with mysql_conn.cursor() as cursor:
+                cursor.execute(sql)
+                User_data = cursor.fetchall()
+                columns = [col[0] for col in cursor.description]
+                result = []
+                print(columns)
+                for row in User_data:
+                    result.append(dict(zip(columns, row)))
+                return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
+        except Exception as e:
+            print(e)
+        mysql_conn.close()
+    else:
+        return []
+
+# car_rental query
+@app.route('/attraction_query', methods = ['POST', 'GET'])
+def attraction_query():
+    datajson = request.get_data()
+    # print(datajson)
+    input = json.loads(datajson)
+    
+    arrival_city = input["arrival_city"]
+    preference = input["preference"]
+    mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'ysm', password= 'yangshiming', db= 'ysm_tourism')
+    if preference == "price" :
+        sql = "select attraction_id, attraction_name, city, price, rating from Attraction where city = '%s' order by price"%(arrival_city)
+    else:
+        sql = "select attraction_id, attraction_name, city, price, rating from Attraction where city = '%s' order by rating desc"%(arrival_city)
+    print(sql)
+    try:
+        with mysql_conn.cursor() as cursor:
+            cursor.execute(sql)
+            User_data = cursor.fetchall()
+            columns = [col[0] for col in cursor.description]
+            result = []
+            print(columns)
+            for row in User_data:
+                result.append(dict(zip(columns, row)))
+            return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
+    except Exception as e:
+        print(e)
+    mysql_conn.close()
+
+@app.route('/guide_query', methods = ['POST', 'GET'])
+def guide_query():
+    datajson = request.get_data()
+    # print(datajson)
+    input = json.loads(datajson)
+    
+    arrival_city = input["arrival_city"]
+    preference = input["preference"]
+    mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'ysm', password= 'yangshiming', db= 'ysm_tourism')
+    if preference == "price" :
+        sql = "select attraction_id, attraction_name, city, price, rating from Attraction where city = '%s' order by price"%(arrival_city)
+    else:
+        sql = "select attraction_id, attraction_name, city, price, rating from Attraction where city = '%s' order by rating desc"%(arrival_city)
+    print(sql)
+    try:
+        with mysql_conn.cursor() as cursor:
+            cursor.execute(sql)
+            User_data = cursor.fetchall()
+            columns = [col[0] for col in cursor.description]
+            result = []
+            print(columns)
+            for row in User_data:
+                result.append(dict(zip(columns, row)))
+            return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
+    except Exception as e:
+        print(e)
+    mysql_conn.close()
 
 @app.route('/bank_query', methods = ['POST', 'GET'])
 def bank_query():
