@@ -6,11 +6,10 @@
     <title>旅游服务计划选择</title>
     <style>
         body {
-            background-image: url('/static/background.png');
+            background-image: url('/static/background_select.png');
             background-size: cover;
             background-position: center;
             font-family: Arial, sans-serif;
-            background: #f4f4f4;
             margin: 0;
             padding: 0;
             display: flex;
@@ -32,7 +31,7 @@
             margin: 0 auto;
             overflow-y: auto;
             padding: 20px;
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.9);
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
@@ -97,34 +96,17 @@
                     <th>价格</th>
                     <th>航空公司</th>
                 </tr>
-                <!-- 插入的数据行 -->
+                {% for flight in form_data.flights %}
                 <tr>
-                    <td><input type="radio" name="flight" value="1" checked></td>
-                    <td>1</td>
-                    <td>北京</td>
-                    <td>成都</td>
-                    <td>2023-12-11</td>
-                    <td>￥1000.00</td>
-                    <td>南方航空</td>
+                    <td><input type="radio" name="flight" value="{{ flight.flight_id }}" {% if loop.first %}checked{% endif %}></td>
+                    <td>{{ flight.flight_id }}</td>
+                    <td>{{ flight.departure_city }}</td>
+                    <td>{{ flight.arrival_city }}</td>
+                    <td>{{ flight.departure_time }}</td>
+                    <td>{{ flight.price }}</td>
+                    <td>{{ flight.airline }}</td>
                 </tr>
-                <tr>
-                    <td><input type="radio" name="flight" value="2"></td>
-                    <td>2</td>
-                    <td>北京</td>
-                    <td>成都</td>
-                    <td>2023-12-11</td>
-                    <td>￥999.00</td>
-                    <td>东方航空</td>
-                </tr>
-                <tr>
-                    <td><input type="radio" name="flight" value="3"></td>
-                    <td>3</td>
-                    <td>北京</td>
-                    <td>成都</td>
-                    <td>2023-12-11</td>
-                    <td>￥750.00</td>
-                    <td>四川航空</td>
-                </tr>
+                {% endfor %}
             </table>
 
             <h2>酒店预订</h2>
@@ -135,26 +117,14 @@
                     <th>房型</th>
                     <th>价格</th>
                 </tr>
-                <!-- 假设的数据行 -->
+                {% for hotel in form_data.hotels %}
                 <tr>
-                    <td><input type="radio" name="room" value="1" checked></td>
-                    <td>101</td>
-                    <td>单人间</td>
-                    <td>￥300.00</td>
+                    <td><input type="radio" name="room" value="{{ hotel.room_id }}" {% if loop.first %}checked{% endif %}></td>
+                    <td>{{ hotel.room_number }}</td>
+                    <td>{{ hotel.room_type }}</td>
+                    <td>{{ hotel.price }}</td>
                 </tr>
-                <tr>
-                    <td><input type="radio" name="room" value="2"></td>
-                    <td>102</td>
-                    <td>单人间</td>
-                    <td>￥240.00</td>
-                </tr>
-                <tr>
-                    <td><input type="radio" name="room" value="3"></td>
-                    <td>103</td>
-                    <td>双人间</td>
-                    <td>￥440.00</td>
-                </tr>
-                <!-- 其他数据行... -->
+                {% endfor %}
             </table>
 
             <h2>租车服务</h2>
@@ -166,22 +136,15 @@
                     <th>租车地点</th>
                     <th>还车地点</th>
                 </tr>
-                <!-- 假设的数据行 -->
+                {% for rental in form_data.car_rentals %}
                 <tr>
-                    <td><input type="radio" name="carrental" value="1" checked></td>
-                    <td>紧凑型车</td>
-                    <td>自动挡</td>
-                    <td>北京</td>
-                    <td>北京</td>
+                    <td><input type="radio" name="carrental" value="{{ rental.carrental_id }}" {% if loop.first %}checked{% endif %}></td>
+                    <td>{{ rental.car_type }}</td>
+                    <td>{{ rental.transmission_type }}</td>
+                    <td>{{ rental.rental_location }}</td>
+                    <td>{{ rental.return_location }}</td>
                 </tr>
-                <tr>
-                    <td><input type="radio" name="carrental" value="2"></td>
-                    <td>SUV</td>
-                    <td>手动挡</td>
-                    <td>北京</td>
-                    <td>北京</td>
-                </tr>
-                <!-- 其他数据行... -->
+            {% endfor %}
             </table>
 
             <h2>景点选择</h2>
@@ -191,18 +154,13 @@
                     <th>景点名称</th>
                     <th>城市</th>
                 </tr>
-                <!-- 假设的数据行 -->
+                {% for attraction in form_data.attractions %}
                 <tr>
-                    <td><input type="radio" name="attraction" value="1" checked></td>
-                    <td>故宫</td>
-                    <td>北京</td>
+                    <td><input type="radio" name="attraction" value="{{ attraction.attraction_id }}" {% if loop.first %}checked{% endif %}></td>
+                    <td>{{ attraction.attraction_name }}</td>
+                    <td>{{ attraction.city }}</td>
                 </tr>
-                <tr>
-                    <td><input type="radio" name="attraction" value="2"></td>
-                    <td>故宫</td>
-                    <td>北京</td>
-                </tr>
-                <!-- 其他数据行... -->
+                {% endfor %}
             </table>
 
             <h2>导游选择</h2>
@@ -212,22 +170,54 @@
                     <th>导游姓名</th>
                     <th>电话</th>
                 </tr>
-                <!-- 假设的数据行 -->
+                {% for guide in form_data.guides %}
                 <tr>
-                    <td><input type="radio" name="guide" value="1" checked></td>
-                    <td>张三</td>
-                    <td>13800138000</td>
+                    <td><input type="radio" name="guide" value="{{ guide.guide_id }}" {% if loop.first %}checked{% endif %}></td>
+                    <td>{{ guide.guide_name }}</td>
+                    <td>{{ guide.guide_phone }}</td>
                 </tr>
-                <tr>
-                    <td><input type="radio" name="guide" value="2" ></td>
-                    <td>李四</td>
-                    <td>13123123222</td>
-                </tr>
-                <!-- 其他数据行... -->
+                {% endfor %}
             </table>
 
             <button type="submit" class="submit-button">提交旅游计划</button>
         </form>
     </div>
+
+    <script>
+        document.getElementById("travel-plan-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+        
+            var selectedFlight = document.querySelector('input[name="flight"]:checked').value;
+            var selectedRoom = document.querySelector('input[name="room"]:checked').value;
+            var selectedCarrental = document.querySelector('input[name="carrental"]:checked').value;
+            var selectedAttraction = document.querySelector('input[name="attraction"]:checked').value;
+            var selectedGuide = document.querySelector('input[name="guide"]:checked').value;
+        
+            var formData = {
+                "flight": selectedFlight,
+                "room": selectedRoom,
+                "carrental": selectedCarrental,
+                "attraction": selectedAttraction,
+                "guide": selectedGuide
+            };
+        
+            fetch('/submit_travel_plan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("旅游计划提交成功！");
+                } else {
+                    throw new Error('提交失败');
+                }
+            })
+            .catch(error => alert(error.message));
+        });
+    </script>
+
 </body>
 </html>

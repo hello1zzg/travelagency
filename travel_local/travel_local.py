@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, request, render_template, session
+from flask import Flask, redirect, url_for, request, render_template, session, jsonify
 import pymysql, time, json, subprocess
 from urllib import request as rq
 from forms import LoanForm
@@ -24,47 +24,47 @@ def login():
     name = request.form.get("nm")
     password = request.form.get("pd")
 
-    headers = {'Content-Type': 'application/json'}
-    map = {}
-    map["name"] = name
-    map["password"] = password
-    datajson = json.dumps(map)
-    r=rq.Request(url="http://10.43.29.9:2024/login",data=bytes(datajson, "utf-8"),headers=headers)
-    result = rq.urlopen(r).read().decode('utf-8')
-    if result == "用户不存在":
-        return "用户不存在"
-    elif result == "密码正确":
-        session["name"] = name
-        return redirect(url_for('get_services'))
-    elif result == "密码错误":
-        return "密码错误"
-    # # print(name, password)
-    # mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'root', password= '12138', db= 'loan')
-
-    # sql1 = "SELECT id, password FROM User WHERE name = '%s'"%(name)
-    # try:
-    #     with mysql_conn.cursor() as cursor:
-    #         cursor.execute(sql1)
-    #         User_data = cursor.fetchone()
-    #         # print(User_data)
-    # except Exception as e:
-    #     print(e)
-
-    # mysql_conn.close()
-
-    # if User_data == None:
+    # headers = {'Content-Type': 'application/json'}
+    # map = {}
+    # map["name"] = name
+    # map["password"] = password
+    # datajson = json.dumps(map)
+    # r=rq.Request(url="http://10.43.29.9:2024/login",data=bytes(datajson, "utf-8"),headers=headers)
+    # result = rq.urlopen(r).read().decode('utf-8')
+    # if result == "用户不存在":
     #     return "用户不存在"
-    # elif password == User_data[1]:
-    #     if name == 'bankadmin1' or name == 'bankadmin2' or name == 'bankadmin3':
-    #         session["bankadmin"] = name
-    #         return redirect(url_for('bank_manual_judge'))
-    #     elif name == 'fundadmin':
-    #         return redirect(url_for('fund_manual_judge'))
-    #     session["userId"] = User_data[0]
-    #     session['name'] = name
+    # elif result == "密码正确":
+    #     session["name"] = name
     #     return redirect(url_for('get_services'))
-    # else:
+    # elif result == "密码错误":
     #     return "密码错误"
+    # # print(name, password)
+    mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'root', password= '12138', db= 'tourism')
+
+    sql1 = "SELECT user_id, password FROM User WHERE user_name = '%s'"%(name)
+    try:
+        with mysql_conn.cursor() as cursor:
+            cursor.execute(sql1)
+            User_data = cursor.fetchone()
+            # print(User_data)
+    except Exception as e:
+        print(e)
+
+    mysql_conn.close()
+
+    if User_data == None:
+        return "用户不存在"
+    elif password == User_data[1]:
+        if name == 'bankadmin1' or name == 'bankadmin2' or name == 'bankadmin3':
+            session["bankadmin"] = name
+            return redirect(url_for('bank_manual_judge'))
+        elif name == 'fundadmin':
+            return redirect(url_for('fund_manual_judge'))
+        session["userId"] = User_data[0]
+        session['name'] = name
+        return redirect(url_for('get_services'))
+    else:
+        return "密码错误"
 
 
 @app.route('/get_services',methods = ['POST', 'GET'])
@@ -72,24 +72,86 @@ def get_services():
     name = session["name"]
     if not name:
         return redirect(url_for('login'))  # 如果未登录，重定向到登录页面
-    return render_template("service_selection.html", name = name)
+    return render_template("service_submit.html", name = name)
 
-@app.route('/ticket_purchase')
-def ticket_purchase():
-    # 这里处理机票购买逻辑
-    return render_template("ticket_purchase.html")
+@app.route('/submit_travel_info', methods=['POST'])
+def submit_travel_info():
+    form_data = {
+        'departure_date': request.form.get('departure_date'),
+        'departure_city': request.form.get('departure_city'),
+        'arrival_city': request.form.get('arrival_city'),
+        'need_car': request.form.get('need_car'),
+        'car_type': request.form.get('car_type') if request.form.get('need_car') == 'yes' else None,
+        'gear_type': request.form.get('gear_type') if request.form.get('need_car') == 'yes' else None,
+        'guide': request.form.get('guide'),
+        'preference': request.form.get('preference')
+    }
 
-@app.route('/hotel_booking')
-def hotel_booking():
-    return render_template("hotel_booking.html")
+    form_data_json = jsonify(form_data)
+    form_data_json_string = json.dumps(form_data)
+    print(form_data_json_string)
+    # rq.Request("8999/")
 
-@app.route('/car_rental')
-def car_rental():
-    return render_template("car_rental.html")
+    # 接收查询到的plan 然后展示到html
 
-@app.route('/attraction_selection')
-def attraction_selection():
-    return render_template("attraction_selection.html")
+        # 模拟构建 JSON 数据
+    mock_data = {
+        "flights": [
+            {"flight_id": 1, "departure_city": "北京", "arrival_city": "成都", "departure_time": "2023-12-11", "price": "￥1000.00", "airline": "南方航空"},
+            {"flight_id": 2, "departure_city": "北京", "arrival_city": "成都", "departure_time": "2023-12-11", "price": "￥999.00", "airline": "东方航空"},
+            {"flight_id": 3, "departure_city": "北京", "arrival_city": "成都", "departure_time": "2023-12-11", "price": "￥750.00", "airline": "四川航空"}
+        ],
+        "hotels": [
+            {"room_id": 1, "room_number": "101", "room_type": "单人间", "price": "￥300.00"},
+            {"room_id": 2, "room_number": "102", "room_type": "单人间", "price": "￥240.00"},
+            {"room_id": 3, "room_number": "103", "room_type": "双人间", "price": "￥440.00"}
+        ],
+        "car_rentals": [
+            {"carrental_id": 1, "car_type": "紧凑型车", "transmission_type": "自动挡", "rental_location": "北京", "return_location": "北京"},
+            {"carrental_id": 2, "car_type": "SUV", "transmission_type": "手动挡", "rental_location": "北京", "return_location": "北京"}
+        ],
+        "attractions": [
+            {"attraction_id": 1, "attraction_name": "故宫", "city": "北京"},
+            {"attraction_id": 2, "attraction_name": "颐和园", "city": "北京"}
+        ],
+        "guides": [
+            {"guide_id": 1, "guide_name": "张三", "guide_phone": "13800138000"},
+            {"guide_id": 2, "guide_name": "李四", "guide_phone": "13123123222"}
+        ]
+    }
+
+    return render_template('service_selection.html', form_data=mock_data)
+
+@app.route('/service_selection')
+def service_selection():
+    form_data = request.args.to_dict()
+    return render_template('service_selection.html',form_data=form_data)
+
+@app.route('/submit_travel_plan', methods=['POST'])
+def submit_travel_plan():
+    data = request.get_json()
+    print("Received travel plan data:", data)
+    # 失败码: 500：服务器错误 501：请求还没有被实现 502：网关错误 503：服务暂时不可用 505：请求的 HTTP 版本不支持。
+    return jsonify({"message": "Travel plan received successfully"}), 200
+
+
+
+# @app.route('/ticket_purchase')
+# def ticket_purchase():
+#     # 这里处理机票购买逻辑
+#     return render_template("ticket_purchase.html")
+
+# @app.route('/hotel_booking')
+# def hotel_booking():
+#     return render_template("hotel_booking.html")
+
+# @app.route('/car_rental')
+# def car_rental():
+#     return render_template("car_rental.html")
+
+# @app.route('/attraction_selection')
+# def attraction_selection():
+#     return render_template("attraction_selection.html")
 
 @app.route('/submit_loanEXP',methods = ['POST', 'GET'])
 def submit_loanEXP():

@@ -5,7 +5,7 @@
     <title>旅游代理服务网页</title>
     <style>
         body {
-            background-image: url('/static/background.png');
+            background-image: url('/static/background_submit.png');
             background-size: cover;
             background-position: center;
             font-family: Arial, sans-serif;
@@ -32,8 +32,15 @@
             display: block;
             margin-bottom: 5px;
         }
-        input, select {
+        select {
             width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        input {
+            width: 96%;
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 4px;
@@ -58,7 +65,7 @@
 </head>
 <body>
     <div class="travel-form">
-        <form id="travel-info-form">
+        <form id="travel-info-form" action="/submit_travel_info" method="post">
             <div class="form-group">
                 <label for="departure-date">选择出行日期:</label>
                 <input type="date" id="departure-date" name="departure_date">
