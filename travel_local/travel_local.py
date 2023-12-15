@@ -24,47 +24,33 @@ def login():
     name = request.form.get("nm")
     password = request.form.get("pd")
 
-    # headers = {'Content-Type': 'application/json'}
-    # map = {}
-    # map["name"] = name
-    # map["password"] = password
-    # datajson = json.dumps(map)
-    # r=rq.Request(url="http://10.43.29.9:2024/login",data=bytes(datajson, "utf-8"),headers=headers)
-    # result = rq.urlopen(r).read().decode('utf-8')
-    # if result == "用户不存在":
-    #     return "用户不存在"
-    # elif result == "密码正确":
-    #     session["name"] = name
-    #     return redirect(url_for('get_services'))
-    # elif result == "密码错误":
-    #     return "密码错误"
-    # # print(name, password)
-    mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'root', password= '12138', db= 'tourism')
-
-    sql1 = "SELECT user_id, password FROM User WHERE user_name = '%s'"%(name)
-    try:
-        with mysql_conn.cursor() as cursor:
-            cursor.execute(sql1)
-            User_data = cursor.fetchone()
-            # print(User_data)
-    except Exception as e:
-        print(e)
-
-    mysql_conn.close()
-
-    if User_data == None:
+    headers = {'Content-Type': 'application/json'}
+    map = {}
+    map["name"] = name
+    map["password"] = password
+    datajson = json.dumps(map)
+    r=rq.Request(url="http://10.43.124.131:2024/login",data=bytes(datajson, "utf-8"),headers=headers)
+    result = rq.urlopen(r).read().decode('utf-8')
+    print(result)
+    if result == "用户不存在":
         return "用户不存在"
-    elif password == User_data[1]:
-        if name == 'bankadmin1' or name == 'bankadmin2' or name == 'bankadmin3':
-            session["bankadmin"] = name
-            return redirect(url_for('bank_manual_judge'))
-        elif name == 'fundadmin':
-            return redirect(url_for('fund_manual_judge'))
-        session["userId"] = User_data[0]
-        session['name'] = name
+    elif result == "密码正确":
+        session["name"] = name
         return redirect(url_for('get_services'))
-    else:
+    elif result == "密码错误":
         return "密码错误"
+
+
+    # mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'ysm', password= 'yangshiming', db= 'ysm_tourism')
+    # sql1 = "SELECT user_id, password FROM User WHERE user_name = '%s'"%(name)
+    # try:
+    #     with mysql_conn.cursor() as cursor:
+    #         cursor.execute(sql1)
+    #         User_data = cursor.fetchone()
+    #         # print(User_data)
+    # except Exception as e:
+    #     print(e)
+    # mysql_conn.close()
 
 
 @app.route('/get_services',methods = ['POST', 'GET'])
@@ -133,25 +119,6 @@ def submit_travel_plan():
     print("Received travel plan data:", data)
     # 失败码: 500：服务器错误 501：请求还没有被实现 502：网关错误 503：服务暂时不可用 505：请求的 HTTP 版本不支持。
     return jsonify({"message": "Travel plan received successfully"}), 200
-
-
-
-# @app.route('/ticket_purchase')
-# def ticket_purchase():
-#     # 这里处理机票购买逻辑
-#     return render_template("ticket_purchase.html")
-
-# @app.route('/hotel_booking')
-# def hotel_booking():
-#     return render_template("hotel_booking.html")
-
-# @app.route('/car_rental')
-# def car_rental():
-#     return render_template("car_rental.html")
-
-# @app.route('/attraction_selection')
-# def attraction_selection():
-#     return render_template("attraction_selection.html")
 
 @app.route('/submit_loanEXP',methods = ['POST', 'GET'])
 def submit_loanEXP():
