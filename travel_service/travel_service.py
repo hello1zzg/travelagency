@@ -211,6 +211,21 @@ def guide_query():
         print(e)
     mysql_conn.close()
 
+@app.route('/travel_recommend', methods = ['POST', 'GET'])
+def travel_recommend():
+    datajson = request.get_data()
+    # print(datajson)
+    input = json.loads(datajson)
+    
+    ticket_result = input["ticket_result"]
+    hotel_result = input["hotel_result"]
+    
+    recommend_result = {}
+    recommend_result["ticket_result"] = ticket_result
+    recommend_result["hotel_result"] = hotel_result
+
+    return json.dumps(recommend_result, ensure_ascii=False)
+
 @app.route('/bank_query', methods = ['POST', 'GET'])
 def bank_query():
 
