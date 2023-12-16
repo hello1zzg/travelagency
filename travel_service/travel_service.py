@@ -79,13 +79,18 @@ def ticket_query():
             cursor.execute(sql)
             User_data = cursor.fetchall()
             columns = [col[0] for col in cursor.description]
-            result = []
+            result = {}
             print(columns)
+            i = 0
             for row in User_data:
-                result.append(dict(zip(columns, row)))
+                label = "ticket" + str(i)
+                i = i + 1
+                result[label] = dict(zip(columns, row)) 
             # return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
             # 使用 json.dumps 和 Response 来禁用 ASCII 转义
             json_data = json.dumps({"data": result}, cls=DateEncoder, ensure_ascii=False)
+            # print(json_string)
+            # json_data = json.dumps({"data": json_string}, cls=DateEncoder, ensure_ascii=False)
             return Response(json_data, mimetype='application/json')
     except Exception as e:
         print(e)
@@ -113,10 +118,14 @@ def hotel_query():
             cursor.execute(sql)
             User_data = cursor.fetchall()
             columns = [col[0] for col in cursor.description]
-            result = []
+            result = {}
             print(columns)
+            i = 0
             for row in User_data:
-                result.append(dict(zip(columns, row)))
+                label = "room" + str(i)
+                i = i + 1
+                result[label] = dict(zip(columns, row))
+                # result.append(dict(zip(columns, row)))
                 # 使用 json.dumps 和 Response 来禁用 ASCII 转义
             json_data = json.dumps({"data": result}, cls=DateEncoder, ensure_ascii=False)
             return Response(json_data, mimetype='application/json')
@@ -149,10 +158,14 @@ def car_rental_query():
                 cursor.execute(sql)
                 User_data = cursor.fetchall()
                 columns = [col[0] for col in cursor.description]
-                result = []
+                result = {}
                 print(columns)
+                i = 0
                 for row in User_data:
-                    result.append(dict(zip(columns, row)))
+                    label = "car" + str(i)
+                    i = i + 1
+                    result[label] = dict(zip(columns, row))
+                    # result.append(dict(zip(columns, row)))
                 # return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
                 json_data = json.dumps({"data": result}, cls=DateEncoder, ensure_ascii=False)
                 return Response(json_data, mimetype='application/json')
@@ -182,10 +195,14 @@ def attraction_query():
             cursor.execute(sql)
             User_data = cursor.fetchall()
             columns = [col[0] for col in cursor.description]
-            result = []
+            result = {}
             print(columns)
+            i = 0
             for row in User_data:
-                result.append(dict(zip(columns, row)))
+                label = "attraction" + str(i)
+                i = i + 1
+                result[label] = dict(zip(columns, row))
+                # result.append(dict(zip(columns, row)))
             json_data = json.dumps({"data": result}, cls=DateEncoder, ensure_ascii=False)
             return Response(json_data, mimetype='application/json')
             # return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
@@ -231,12 +248,19 @@ def travel_recommend():
     
     ticket_result = input["ticket_result"]
     hotel_result = input["hotel_result"]
-    
+    car_rental_result = input["car_rental_result"]
+    attraction_result = input["attraction_result"]
+
     recommend_result = {}
     recommend_result["ticket_result"] = ticket_result
     recommend_result["hotel_result"] = hotel_result
+    recommend_result["car_rental_result"] = car_rental_result
+    recommend_result["attraction_result"] = attraction_result
+    # recommend_result["hotel_result"] = hotel_result
 
     return json.dumps(recommend_result, ensure_ascii=False)
+
+
 
 @app.route('/bank_query', methods = ['POST', 'GET'])
 def bank_query():
