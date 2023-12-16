@@ -41,18 +41,6 @@ def login():
         return "密码错误"
 
 
-    # mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'ysm', password= 'yangshiming', db= 'ysm_tourism')
-    # sql1 = "SELECT user_id, password FROM User WHERE user_name = '%s'"%(name)
-    # try:
-    #     with mysql_conn.cursor() as cursor:
-    #         cursor.execute(sql1)
-    #         User_data = cursor.fetchone()
-    #         # print(User_data)
-    # except Exception as e:
-    #     print(e)
-    # mysql_conn.close()
-
-
 @app.route('/get_services',methods = ['POST', 'GET'])
 def get_services():
     name = session["name"]
