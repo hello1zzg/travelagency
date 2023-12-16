@@ -20,6 +20,7 @@ INSERT INTO Company values
 	
 -- user
 INSERT INTO User values(1, '杨世明', '123456');
+INSERT INTO User values(2, '张朝阳', '12138');
 
 -- flight
 INSERT INTO FlightInfo values

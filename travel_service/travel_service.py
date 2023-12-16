@@ -1,5 +1,5 @@
 from decimal import Decimal
-from flask import Flask, redirect, url_for, request, render_template
+from flask import Flask, Response, redirect, url_for, request, render_template,jsonify
 import pymysql
 from urllib import request as rq
 import json ,time, math
@@ -83,7 +83,10 @@ def ticket_query():
             print(columns)
             for row in User_data:
                 result.append(dict(zip(columns, row)))
-            return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
+            # return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
+            # 使用 json.dumps 和 Response 来禁用 ASCII 转义
+            json_data = json.dumps({"data": result}, cls=DateEncoder, ensure_ascii=False)
+            return Response(json_data, mimetype='application/json')
     except Exception as e:
         print(e)
     mysql_conn.close()
@@ -114,7 +117,10 @@ def hotel_query():
             print(columns)
             for row in User_data:
                 result.append(dict(zip(columns, row)))
-            return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
+                # 使用 json.dumps 和 Response 来禁用 ASCII 转义
+            json_data = json.dumps({"data": result}, cls=DateEncoder, ensure_ascii=False)
+            return Response(json_data, mimetype='application/json')
+            # return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
     except Exception as e:
         print(e)
     mysql_conn.close()
@@ -147,7 +153,9 @@ def car_rental_query():
                 print(columns)
                 for row in User_data:
                     result.append(dict(zip(columns, row)))
-                return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
+                # return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
+                json_data = json.dumps({"data": result}, cls=DateEncoder, ensure_ascii=False)
+                return Response(json_data, mimetype='application/json')
         except Exception as e:
             print(e)
         mysql_conn.close()
@@ -178,7 +186,9 @@ def attraction_query():
             print(columns)
             for row in User_data:
                 result.append(dict(zip(columns, row)))
-            return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
+            json_data = json.dumps({"data": result}, cls=DateEncoder, ensure_ascii=False)
+            return Response(json_data, mimetype='application/json')
+            # return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
     except Exception as e:
         print(e)
     mysql_conn.close()
@@ -206,7 +216,9 @@ def guide_query():
             print(columns)
             for row in User_data:
                 result.append(dict(zip(columns, row)))
-            return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
+            json_data = json.dumps({"data": result}, cls=DateEncoder, ensure_ascii=False)
+            return Response(json_data, mimetype='application/json')
+            # return json.dumps(result, cls=DateEncoder, ensure_ascii=False)
     except Exception as e:
         print(e)
     mysql_conn.close()

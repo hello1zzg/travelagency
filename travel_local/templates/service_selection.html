@@ -73,6 +73,11 @@
         .form-container {
             padding: 20px;
         }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* 按钮之间的间隙 */
+        }
 
         /* 添加媒体查询以处理不同屏幕尺寸的情况 */
         @media (max-height: 800px) {
@@ -178,8 +183,10 @@
                 </tr>
                 {% endfor %}
             </table>
-
-            <button type="submit" class="submit-button">提交旅游计划</button>
+            <div class="button-container">
+                <button type="button" class="submit-button" onclick="window.location.href='/get_services'">返回重选</button>
+                <button type="submit" class="submit-button">提交旅游计划</button>
+            </div>
         </form>
     </div>
 
