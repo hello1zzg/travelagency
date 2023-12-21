@@ -261,6 +261,118 @@ def travel_recommend():
     return json.dumps(recommend_result, ensure_ascii=False)
 
 
+# 买飞机票
+@app.route('/ticket_purchase', methods = ['POST', 'GET'])
+def ticket_purchase():
+    datajson = request.get_data()
+    # print(datajson)
+    input = json.loads(datajson)
+    
+    user_id = input["user_id"]
+    flight_id = input["flight_id"]
+
+    sql = "insert into ticket_purchase values (%s, %s)"%(user_id, flight_id)
+
+    mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'ysm', password= 'yangshiming', db= 'ysm_tourism')
+
+    print(sql)
+    with mysql_conn.cursor() as cursor:
+        cursor.execute(sql)
+        mysql_conn.commit()
+        # result = cursor.fetchone()
+        # print(result)
+    return "200"
+
+# 酒店预定
+@app.route('/hotel_preserve', methods = ['POST', 'GET'])
+def hotel_preserve():
+    datajson = request.get_data()
+    # print(datajson)
+    input = json.loads(datajson)
+    
+    user_id = input["user_id"]
+    hotel_id = input["hotel_id"]
+    room_id = input["room_id"]
+
+    sql = "insert into hotel_preserve values (%s, %s, %s)"%(user_id, hotel_id, room_id)
+
+    mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'ysm', password= 'yangshiming', db= 'ysm_tourism')
+
+    print(sql)
+    with mysql_conn.cursor() as cursor:
+        cursor.execute(sql)
+        mysql_conn.commit()
+        # result = cursor.fetchone()
+        # print(result)
+    return "200"
+
+
+# 车子预定
+@app.route('/car_preserve', methods = ['POST', 'GET'])
+def car_preserve():
+    datajson = request.get_data()
+    # print(datajson)
+    input = json.loads(datajson)
+    
+    user_id = input["user_id"]
+    carrental_id = input["carrental_id"]
+
+    sql = "insert into car_preserve values (%s, %s)"%(user_id, carrental_id)
+
+    mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'ysm', password= 'yangshiming', db= 'ysm_tourism')
+
+    print(sql)
+    with mysql_conn.cursor() as cursor:
+        cursor.execute(sql)
+        mysql_conn.commit()
+        # result = cursor.fetchone()
+        # print(result)
+    return "200"
+
+
+# 景点预定
+@app.route('/attraction_preserve', methods = ['POST', 'GET'])
+def attraction_preserve():
+    datajson = request.get_data()
+    # print(datajson)
+    input = json.loads(datajson)
+    
+    user_id = input["user_id"]
+    attraction_id = input["attraction_id"]
+
+    sql = "insert into attraction_preserve values (%s, %s)"%(user_id, attraction_id)
+
+    mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'ysm', password= 'yangshiming', db= 'ysm_tourism')
+
+    print(sql)
+    with mysql_conn.cursor() as cursor:
+        cursor.execute(sql)
+        mysql_conn.commit()
+        # result = cursor.fetchone()
+        # print(result)
+    return "200"
+
+# 导游预定
+@app.route('/guide_preserve', methods = ['POST', 'GET'])
+def guide_preserve():
+    datajson = request.get_data()
+    # print(datajson)
+    input = json.loads(datajson)
+    
+    user_id = input["user_id"]
+    guide_id = input["guide_id"]
+
+    sql = "insert into guide_preserve values (%s, %s)"%(user_id, guide_id)
+
+    mysql_conn = pymysql.connect(host= '127.0.0.1', port= 3306, user= 'ysm', password= 'yangshiming', db= 'ysm_tourism')
+
+    print(sql)
+    with mysql_conn.cursor() as cursor:
+        cursor.execute(sql)
+        mysql_conn.commit()
+        # result = cursor.fetchone()
+        # print(result)
+    return "200"
 
 @app.route('/bank_query', methods = ['POST', 'GET'])
 def bank_query():
@@ -694,4 +806,4 @@ def fund_auto_judge():
 
 
 if __name__ == '__main__':
-   app.run(debug = True, host='0.0.0.0',port=2024)
+   app.run(debug = True, host='0.0.0.0',port=2025)
