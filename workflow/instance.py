@@ -1,55 +1,57 @@
 import subprocess
-import sys,getopt,json
+import sys
+import getopt
+import json
  
-opts,args = getopt.getopt(sys.argv[1:],"h", ["allocationTablePath=", "deploymentName=","processDataPath=","businessDataPath="])
-deploymentName = ""
-staticAllocationTable = ""
-processData=""
-businessData=""
-for op,value in opts:
-    if op == "-h":
-        #usage()
-        print("allocationTablePath:静态分配表文件的路径\ndeploymentName:部署的deployment的Name\nprocessDataPath:processData文件的路径\nbusinessData:businessData文件的路径")
-        print("注1:allocationTable,processData,businessData,均需要为json格式")
-        print("注2:参数中存在空格记得使用双引号，如\"** *\"")
-        print("python instance.py --allocationTablePath= --deploymentName= --processDataPath= --businessDataPath=")
-        sys.exit()
-    elif op=="--allocationTablePath":
-        f = open(value, 'r')
-        f_str = f.read()
-        staticAllocationTable=f_str
-    elif op=="--deploymentName":
-        deploymentName=value
-    elif op=="--processDataPath":
-        f = open(value, 'r')
-        f_str = f.read()
-        processData=f_str
-    elif op=="--businessDataPath":
-        f = open(value, 'r')
-        f_str = f.read()
-        businessData=f_str
-map={}
-processData=processData.replace("\n","")
-businessData=businessData.replace("\n","")
-staticAllocationTable=staticAllocationTable.replace("\n","")
+# python3 instance.py --allocationTablePath=./table/0923_Submit.bpmn.table --deploymentName=0923TravelRecommend.bpmn --processDataPath=./data/processData.txt --businessDataPath=./data/instanceData.txt
 
+def main():
+    opts, args = getopt.getopt(sys.argv[1:], "h", ["allocationTablePath=", "deploymentName=", "processDataPath=", "businessDataPath="])
+    deploymentName = ""
+    staticAllocationTable = ""
+    processData = ""
+    businessData = ""
 
+    for op, value in opts:
+        if op == "-h":
+            #usage()
+            print("allocationTablePath:静态分配表文件的路径\ndeploymentName:部署的deployment的Name\nprocessDataPath:processData文件的路径\nbusinessData:businessData文件的路径")
+            print("注1:allocationTable,processData,businessData,均需要为json格式")
+            print("注2:参数中存在空格记得使用双引号，如\"** *\"")
+            print("python instance.py --allocationTablePath= --deploymentName= --processDataPath= --businessDataPath=")
+            sys.exit()
+        elif op == "--allocationTablePath":
+            with open(value, 'r') as f:
+                staticAllocationTable = f.read()
+        elif op == "--deploymentName":
+            deploymentName = value
+        elif op == "--processDataPath":
+            with open(value, 'r') as f:
+                processData = f.read()
+        elif op == "--businessDataPath":
+            with open(value, 'r') as f:
+                businessData = f.read()
 
-map["deploymentName"]=deploymentName
-map["processData"]=processData
-map["businessData"]=businessData
-map["staticAllocationTable"]=staticAllocationTable
-map["fcn"]="instance"
-datajsonstr=json.dumps(map)
-preStr="curl -X POST http://10.77.70.173:8999/grafana/wfRequest -H \"Accept: application/json\" -H \"Content-Type: application/json\" -d "
-curlString=preStr+json.dumps(datajsonstr)
-print(curlString)
-result = subprocess.Popen(curlString, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8').communicate()[0]
-#proxies = {'http': 'socks5://127.0.0.1:7891','https':'socks5://127.0.0.1:7891'}
-print(result)
-resultMap=json.loads(result)
+    map = {
+        "deploymentName": deploymentName,
+        "processData": processData.replace("\n", ""),
+        "businessData": businessData.replace("\n", ""),
+        "staticAllocationTable": staticAllocationTable.replace("\n", ""),
+        "fcn": "instance"
+    }
 
-if resultMap["模拟执行结果"]:
-    f=open("workflow/data/oid.txt","w")
-    f.truncate(0)
-    f.write(resultMap["Oid"])
+    data_json_str = json.dumps(map)
+    curl_command = f"curl -X POST http://10.77.110.222:8999/grafana/wfRequest/instance  -H \"Accept: application/json\" -H \"Content-Type: application/json\" -d '{data_json_str}'"
+
+    try:
+        result = subprocess.run(curl_command, shell=True, capture_output=True, text=True)
+        print(result.stdout)
+        resultMap = json.loads(result.stdout)
+        if resultMap.get("模拟执行结果"):
+            with open("data/oid.txt", "w") as f:
+                f.write(resultMap["Oid"])
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
+if __name__ == "__main__":
+    main()

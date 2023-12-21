@@ -1,0 +1,403 @@
+{
+	"info": {
+		"_postman_id": "291283dc-b5f5-4c4e-8424-c8edb3218878",
+		"name": "微服务2023",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31828516"
+	},
+	"item": [
+		{
+			"name": "nacos",
+			"item": [
+				{
+					"name": "hotel_query",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"s-consumerName\": \"A\",\r\n    \"headers\": {},\r\n    \"body\": {\r\n    \"departure_date\": \"2023-12-11\", \r\n    \"departure_city\": \"北京\", \r\n    \"arrival_city\": \"成都\", \r\n    \"need_car\": \"no\", \r\n    \"car_type\": null, \r\n    \"gear_type\": null, \r\n    \"guide\": \"full\", \r\n    \"preference\": \"rating\"\r\n    },\r\n    \"s-serviceName\": \"0923_hotel_query\",\r\n    \"s-group\": \"WORKFLOW\",\r\n    \"s-url\": \"/hotel_query\",\r\n    \"s-method\": \"POST\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.77.110.222:8999/grafana/runNoCache?loadBalance=enabled",
+							"protocol": "http",
+							"host": [
+								"10",
+								"77",
+								"110",
+								"222"
+							],
+							"port": "8999",
+							"path": [
+								"grafana",
+								"runNoCache"
+							],
+							"query": [
+								{
+									"key": "loadBalance",
+									"value": "enabled"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ticket-query",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"s-consumerName\": \"A\",\r\n     \"headers\": {},\r\n     \"body\": {\r\n         \"departure_date\": \"2023-12-11\",\r\n         \"departure_city\": \"北京\",\r\n         \"arrival_city\": \"成都\",\r\n         \"preference\": \"rating\"\r\n     },\r\n     \"s-serviceName\": \"0923_ticket_query\",\r\n     \"s-group\": \"WORKFLOW\",\r\n     \"s-url\": \"/ticket_query\",\r\n     \"s-method\": \"POST\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.77.110.222:8999/grafana/runNoCache?loadBalance=enabled",
+							"protocol": "http",
+							"host": [
+								"10",
+								"77",
+								"110",
+								"222"
+							],
+							"port": "8999",
+							"path": [
+								"grafana",
+								"runNoCache"
+							],
+							"query": [
+								{
+									"key": "loadBalance",
+									"value": "enabled"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "car-rental-query",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"s-consumerName\": \"A\",\r\n    \"headers\": {},\r\n    \"body\": {\r\n        \"need_car\": \"2023-12-11\", \r\n        \"car_type\": \"SUV\", \r\n        \"gear_type\": \"自动挡\", \r\n        \"arrival_city\": \"成都\",\r\n\t\t\t\t\"preference\": \"rating\"\r\n    },\r\n    \"s-serviceName\": \"0923_car_rental_query\",\r\n\t\t\"s-group\": \"WORKFLOW\",\r\n    \"s-url\": \"/car_rental_query\",\r\n    \"s-method\": \"POST\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.77.110.222:8999/grafana/runNoCache?loadBalance=enabled",
+							"protocol": "http",
+							"host": [
+								"10",
+								"77",
+								"110",
+								"222"
+							],
+							"port": "8999",
+							"path": [
+								"grafana",
+								"runNoCache"
+							],
+							"query": [
+								{
+									"key": "loadBalance",
+									"value": "enabled"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "attraction query",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"s-consumerName\": \"A\",\r\n    \"headers\": {},\r\n    \"body\": {\r\n        \"arrival_city\": \"成都\",\r\n\t\t\"preference\": \"price\"\r\n    },\r\n    \"s-group\": \"WORKFLOW\",\r\n    \"s-serviceName\": \"0923_attraction_query\",\r\n    \"s-url\": \"/attraction_query\",\r\n    \"s-method\": \"POST\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.77.110.222:8999/grafana/runNoCache?loadBalance=enabled",
+							"protocol": "http",
+							"host": [
+								"10",
+								"77",
+								"110",
+								"222"
+							],
+							"port": "8999",
+							"path": [
+								"grafana",
+								"runNoCache"
+							],
+							"query": [
+								{
+									"key": "loadBalance",
+									"value": "enabled"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "微服务",
+			"item": [
+				{
+					"name": "Submit",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Oid\":\"diagram-2023000925.bpmn@72402f1a-b00a-4a12-891a-e66fbe86ec2d\",\r\n    \"taskName\":\"Submit\",\r\n    \"businessData\": \"{ \\\"departure_date\\\": \\\"2023-12-11\\\", \\\"departure_city\\\": \\\"北京\\\", \\\"arrival_city\\\": \\\"成都\\\", \\\"need_car\\\": \\\"yes\\\", \\\"car_type\\\": \\\"SUV\\\", \\\"preference\\\": \\\"rating\\\" }\",\r\n    \"processData\":\"{}\",\r\n    \"user\":\"testone\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.77.110.222:8999/grafana/wfRequest/complete",
+							"protocol": "http",
+							"host": [
+								"10",
+								"77",
+								"110",
+								"222"
+							],
+							"port": "8999",
+							"path": [
+								"grafana",
+								"wfRequest",
+								"complete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "local",
+			"item": [
+				{
+					"name": "http://10.43.29.9:2024/login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"杨世明\",\r\n    \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.43.29.9:2024/login",
+							"protocol": "http",
+							"host": [
+								"10",
+								"43",
+								"29",
+								"9"
+							],
+							"port": "2024",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ticket_query",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"departure_date\": \"2023-12-11\", \r\n    \"departure_city\": \"北京\", \r\n    \"arrival_city\": \"成都\", \r\n    \"need_car\": \"no\", \r\n    \"car_type\": null, \r\n    \"gear_type\": null, \r\n    \"guide\": \"full\", \r\n    \"preference\": \"rating\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.43.124.131:2024/ticket_query",
+							"protocol": "http",
+							"host": [
+								"10",
+								"43",
+								"124",
+								"131"
+							],
+							"port": "2024",
+							"path": [
+								"ticket_query"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "hotel_query",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"departure_date\": \"2023-12-11\", \r\n    \"departure_city\": \"北京\", \r\n    \"arrival_city\": \"成都\", \r\n    \"need_car\": \"no\", \r\n    \"car_type\": null, \r\n    \"gear_type\": null, \r\n    \"guide\": \"full\", \r\n    \"preference\": \"rating\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.43.124.131:2024/hotel_query",
+							"protocol": "http",
+							"host": [
+								"10",
+								"43",
+								"124",
+								"131"
+							],
+							"port": "2024",
+							"path": [
+								"hotel_query"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "car rental query",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"departure_date\": \"2023-12-11\", \r\n    \"departure_city\": \"北京\", \r\n    \"arrival_city\": \"成都\", \r\n    \"need_car\": \"yes\", \r\n    \"car_type\": \"SUV\", \r\n    \"gear_type\": \"自动挡\", \r\n    \"guide\": \"full\", \r\n    \"preference\": \"rating\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.43.124.131:2024/car_rental_query",
+							"protocol": "http",
+							"host": [
+								"10",
+								"43",
+								"124",
+								"131"
+							],
+							"port": "2024",
+							"path": [
+								"car_rental_query"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Attraction Query",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"departure_date\": \"2023-12-11\", \r\n    \"departure_city\": \"北京\", \r\n    \"arrival_city\": \"成都\", \r\n    \"need_car\": \"yes\", \r\n    \"car_type\": \"SUV\", \r\n    \"gear_type\": \"自动挡\", \r\n    \"guide\": \"full\", \r\n    \"preference\": \"rating\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.43.124.131:2024/attraction_query",
+							"protocol": "http",
+							"host": [
+								"10",
+								"43",
+								"124",
+								"131"
+							],
+							"port": "2024",
+							"path": [
+								"attraction_query"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Travel Recommend",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"ticket_result\": [\r\n        {\"flight_id\": 2, \"departure_city\": \"北京\", \"arrival_city\": \"成都\", \"departure_time\": \"2023-12-11\", \"price\": 999.0,\r\n        \"company_name\": \"东方航空\"}, \r\n        {\"flight_id\": 1, \"departure_city\": \"北京\", \"arrival_city\": \"成都\", \"departure_time\": \"2023-12-11\", \"price\": 1000.0,\r\n        \"company_name\": \"南方航空\"}, \r\n        {\"flight_id\": 3, \"departure_city\": \"北京\", \"arrival_city\": \"成都\", \"departure_time\": \"2023-12-11\", \"price\": 750.0, \"company_name\": \"四川航空\"}],\r\n    \"hotel_result\": [\r\n        {\"room_id\": 4, \"room_number\": \"401\", \"room_type\": \"双人间\", \"room_price\": 600.0, \"rating\": 5.0, \"hotel_name\": \"XYZ酒店\"}\r\n        ,{\"room_id\": 1, \"room_number\": \"101\", \"room_type\": \"单人间\", \"room_price\": 300.0, \"rating\": 4.8, \"hotel_name\": \"ABC酒店\"},{\"room_id\": 2, \"room_number\": \"201\", \"room_type\": \"双人间\", \"room_price\": 500.0, \"rating\": 4.8, \"hotel_name\": \"ABC酒店\"},{\"room_id\": 3, \"room_number\": \"301\", \"room_type\": \"双人间\", \"room_price\": 200.0, \"rating\": 4.2, \"hotel_name\": \"DEF酒店\"}]\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.43.124.131:2024/travel_recommend",
+							"protocol": "http",
+							"host": [
+								"10",
+								"43",
+								"124",
+								"131"
+							],
+							"port": "2024",
+							"path": [
+								"travel_recommend"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

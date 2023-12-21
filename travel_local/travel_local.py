@@ -1,8 +1,9 @@
 from flask import Flask, redirect, url_for, request, render_template, session, jsonify
-import pymysql, time, json, subprocess
+import pymysql, time, json
+import requests
 from urllib import request as rq
-from forms import LoanForm
-from loan_calculator import loan_calculator
+import re
+
 
 app = Flask(__name__)
 app.secret_key = 'development key'
@@ -12,6 +13,34 @@ app.secret_key = 'development key'
 session用作全局变量:
 name, userId,
 '''
+
+def parse_ticket_result(ticket_result_str):
+    if not ticket_result_str:
+        return []
+    ticket_pattern = r'\{price=(.*?), company_name=(.*?), arrival_city=(.*?), departure_city=(.*?), departure_time=(.*?), flight_id=(.*?)\}'
+    tickets = re.findall(ticket_pattern, ticket_result_str)
+    return [{"flight_id": int(t[5]), "departure_city": t[3], "arrival_city": t[2], "departure_time": t[4], "price": f"￥{float(t[0]):.2f}", "airline": t[1]} for t in tickets]
+
+def parse_hotel_result(hotel_result_str):
+    if not hotel_result_str:
+        return []
+    hotel_pattern = r'\{room_id=(.*?), room_price=(.*?), rating=(.*?), room_number=(.*?), room_type=(.*?), hotel_name=(.*?)\}'
+    hotels = re.findall(hotel_pattern, hotel_result_str)
+    return [{"room_id": int(h[0]), "room_number": h[3], "room_type": h[4], "price": f"￥{float(h[1]):.2f}"} for h in hotels]
+
+def parse_car_rental_result(car_rental_result_str):
+    if not car_rental_result_str:
+        return []
+    car_rental_pattern = r'\{carrental_id=(.*?), car_type=(.*?), transmission_type=(.*?), rental_location=(.*?), return_location=(.*?), price=(.*?), rating=(.*?), company_name=(.*?)\}'
+    car_rentals = re.findall(car_rental_pattern, car_rental_result_str)
+    return [{"carrental_id": int(c[0]), "car_type": c[1], "transmission_type": c[2], "rental_location": c[3], "return_location": c[4], "price": f"￥{float(c[5]):.2f}"} for c in car_rentals]
+
+def parse_attraction_result(attraction_result_str):
+    if not attraction_result_str:
+        return []
+    attraction_pattern = r'\{attraction_name=(.*?), city=(.*?), price=(.*?), attraction_id=(.*?), rating=(.*?)\}'
+    attractions = re.findall(attraction_pattern, attraction_result_str)
+    return [{"attraction_id": int(a[3]), "attraction_name": a[0], "city": a[1], "price": f"￥{float(a[2]):.2f}"} for a in attractions]
 
 
 @app.route('/')
@@ -48,58 +77,100 @@ def get_services():
         return redirect(url_for('login'))  # 如果未登录，重定向到登录页面
     return render_template("service_submit.html", name = name)
 
-@app.route('/submit_travel_info', methods=['POST'])
+@app.route('/submit_travel_info', methods=['POST', 'GET'])
 def submit_travel_info():
+    # 获取表单数据
+    departure_date = request.form.get("departure_date")
+    departure_city = request.form.get("departure_city")
+    arrival_city = request.form.get("arrival_city")
+    need_car = request.form.get("need_car")
+    car_type = request.form.get("car_type") if need_car == "yes" else None
+    gear_type = request.form.get("gear_type") if need_car == "yes" else None
+    guide = request.form.get("guide")
+    preference = request.form.get("preference")
+
+    # 构造业务数据的 Python 字典
+    business_data_dict = {
+        "departure_date": departure_date,
+        "departure_city": departure_city,
+        "arrival_city": arrival_city,
+        "need_car": need_car,
+        "car_type": car_type,
+        # "gear_type": gear_type,
+        # "guide": guide,
+        "preference": preference
+    }
+    # 将业务数据字典序列化为 JSON 字符串
+    business_data_json = json.dumps(business_data_dict,ensure_ascii=False)
+
+    # 准备发送请求的数据
+    Oid = open("/home/torres/codes/travelAgency/workflow/data/oid.txt", 'r').read().strip()
+    request_data = {
+        "Oid": Oid,
+        "taskName": "Submit",
+        "processData": "{}",
+        "businessData": business_data_json,
+        "user": "anyone"
+    }
+    print(json.dumps(business_data_json, ensure_ascii=False))
+    # 发送请求到 BPMN 服务
+    headers = {'Content-Type': 'application/json'}
+    response = requests.post(url="http://10.77.110.222:8999/grafana/wfRequest/complete", 
+                             data=json.dumps(request_data), 
+                             headers=headers)
+    if response.status_code != 200:
+        # 处理失败情况
+        print("Error in BPMN request:", response.text)
+        return jsonify({"error": "Failed to process BPMN request"})
+    # 处理成功情况
+    print("BPMN request successful:", response.text)
+
+    url = "http://10.77.110.222:8999/grafana/getResponseByOid/"+Oid
+    payload = {}
+    headers = {}
+    time.sleep(1)
+    response = requests.request("GET", url, headers=headers, data=payload)
+    print(response.text)
+    response_text=response.text
+    # 解析 JSON 字符串
+    response_data = json.loads(response_text)
+
+    # 提取 businessData 字段
+    business_data_str = response_data["businessData"]
+
+    # 解析 businessData 的 JSON 字符串
+    business_data = json.loads(business_data_str)
+
+    # 提取各个结果
+    ticket_result = business_data.get("ticket_result")
+    hotel_result = business_data.get("hotel_result")
+    car_rental_result = business_data.get("car_rental_result")
+    attraction_result = business_data.get("attraction_result")
+
+    # 打印结果
+    print("-------------------------------")
+    print("Ticket Result:", ticket_result)
+    print("Hotel Result:", hotel_result)
+    print("Car Rental Result:", car_rental_result)
+    print("Attraction Result:", attraction_result)
+
     form_data = {
-        'departure_date': request.form.get('departure_date'),
-        'departure_city': request.form.get('departure_city'),
-        'arrival_city': request.form.get('arrival_city'),
-        'need_car': request.form.get('need_car'),
-        'car_type': request.form.get('car_type') if request.form.get('need_car') == 'yes' else None,
-        'gear_type': request.form.get('gear_type') if request.form.get('need_car') == 'yes' else None,
-        'guide': request.form.get('guide'),
-        'preference': request.form.get('preference')
+        "flights": parse_ticket_result(ticket_result),
+        "hotels": parse_hotel_result(hotel_result),
+        "car_rentals": parse_car_rental_result(car_rental_result),
+        "attractions": parse_attraction_result(attraction_result)
     }
-
-    form_data_json = jsonify(form_data)
-    form_data_json_string = json.dumps(form_data)
-    print(form_data_json_string)
-    # rq.Request("8999/")
-
-    # 接收查询到的plan 然后展示到html
-
-        # 模拟构建 JSON 数据
-    mock_data = {
-        "flights": [
-            {"flight_id": 1, "departure_city": "北京", "arrival_city": "成都", "departure_time": "2023-12-11", "price": "￥1000.00", "airline": "南方航空"},
-            {"flight_id": 2, "departure_city": "北京", "arrival_city": "成都", "departure_time": "2023-12-11", "price": "￥999.00", "airline": "东方航空"},
-            {"flight_id": 3, "departure_city": "北京", "arrival_city": "成都", "departure_time": "2023-12-11", "price": "￥750.00", "airline": "四川航空"}
-        ],
-        "hotels": [
-            {"room_id": 1, "room_number": "101", "room_type": "单人间", "price": "￥300.00"},
-            {"room_id": 2, "room_number": "102", "room_type": "单人间", "price": "￥240.00"},
-            {"room_id": 3, "room_number": "103", "room_type": "双人间", "price": "￥440.00"}
-        ],
-        "car_rentals": [
-            {"carrental_id": 1, "car_type": "紧凑型车", "transmission_type": "自动挡", "rental_location": "北京", "return_location": "北京"},
-            {"carrental_id": 2, "car_type": "SUV", "transmission_type": "手动挡", "rental_location": "北京", "return_location": "北京"}
-        ],
-        "attractions": [
-            {"attraction_id": 1, "attraction_name": "故宫", "city": "北京"},
-            {"attraction_id": 2, "attraction_name": "颐和园", "city": "北京"}
-        ],
-        "guides": [
-            {"guide_id": 1, "guide_name": "张三", "guide_phone": "13800138000"},
-            {"guide_id": 2, "guide_name": "李四", "guide_phone": "13123123222"}
-        ]
-    }
-
-    return render_template('service_selection.html', form_data=mock_data)
+    print(form_data)
+    session['form_data'] = form_data
+    return redirect(url_for('service_selection'))
 
 @app.route('/service_selection')
 def service_selection():
-    form_data = request.args.to_dict()
-    return render_template('service_selection.html',form_data=form_data)
+    # form_data = request.args.get('form_data')
+    form_data = session.get('form_data', {})
+    print("--------------------------form_data--------------------------")
+    print(form_data)
+    return render_template('service_selection.html', form_data=form_data)
 
 @app.route('/submit_travel_plan', methods=['POST'])
 def submit_travel_plan():
