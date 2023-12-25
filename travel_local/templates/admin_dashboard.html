@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+
+    <h2>Tickets</h2>
+
+    <h2>Add Ticket</h2>
+    <form action="{{ url_for('add_ticket') }}" method="post">
+        <input type="number" name="flight_id" placeholder="Flight ID" required>
+        <input type="text" name="departure_city" placeholder="Departure City" required>
+        <input type="text" name="arrival_city" placeholder="Arrival City" required>
+        <input type="date" name="departure_time" required>
+        <input type="number" name="price" placeholder="Price" required>
+        <input type="number" step="0.1" name="rating" placeholder="Rating" required>
+        <button type="submit">Add Ticket</button>
+    </form>
+
+
+    <!-- 删除 Ticket 的表单 -->
+    <h2>Delete Ticket</h2>
+    <form action="{{ url_for('delete_ticket') }}" method="post">
+        <input type="number" name="ticket_id" placeholder="Ticket ID" required>
+        <button type="submit">Delete Ticket</button>
+    </form>
+
+    <!-- 更新 Ticket 的表单 -->
+    <h2>Update Ticket</h2>
+    <form action="{{ url_for('update_ticket') }}" method="post">
+        <input type="number" name="flight_id" placeholder="Ticket ID" required>
+        <input type="text" name="departure_city" placeholder="New Departure City">
+        <input type="text" name="arrival_city" placeholder="New Arrival City">
+        <input type="date" name="departure_time">
+        <input type="number" name="price" placeholder="New Price">
+        <input type="number" step="0.1" name="rating" placeholder="New Rating">
+        <button type="submit">Update Ticket</button>
+    </form>
+    
+    <table border="1">
+        <tr>
+            <th>Flight ID</th>
+            <th>Departure City</th>
+            <th>Arrival City</th>
+            <th>Departure Date</th>
+            <th>Price</th>
+            <th>Rating</th>
+        </tr>
+        {% for ticket in tickets %}
+        <tr>
+            <td>{{ ticket[0] }}</td>
+            <td>{{ ticket[1] }}</td>
+            <td>{{ ticket[2] }}</td>
+            <td>{{ ticket[3] }}</td>
+            <td>{{ ticket[4] }}</td>
+            <td>{{ ticket[5] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- <h2>Hotels</h2>
+    <table border="1">
+        <tr>
+            <th>Hotel ID</th>
+            <th>Hotel Name</th>
+            <th>City</th>
+            <th>Rating</th>
+            <th>Room Count</th>
+        </tr>
+        {% for hotel in hotels %}
+        <tr>
+            <td>{{ hotel[0] }}</td>
+            <td>{{ hotel[1] }}</td>
+            <td>{{ hotel[2] }}</td>
+            <td>{{ hotel[3] }}</td>
+            <td>{{ hotel[4] }}</td>
+        </tr>
+        {% endfor %}
+    </table> -->
+
+    <!-- <h2>Car Rentals</h2>
+    <table border="1">
+        <tr>
+            <th>Car ID</th>
+            <th>Type</th>
+            <th>Transmission</th>
+            <th>Rental Location</th>
+            <th>Return Location</th>
+            <th>Price</th>
+            <th>Rating</th>
+            <th>Company ID</th>
+        </tr>
+        {% for car_rental in car_rentals %}
+        <tr>
+            <td>{{ car_rental[0] }}</td>
+            <td>{{ car_rental[1] }}</td>
+            <td>{{ car_rental[2] }}</td>
+            <td>{{ car_rental[3] }}</td>
+            <td>{{ car_rental[4] }}</td>
+            <td>{{ car_rental[5] }}</td>
+            <td>{{ car_rental[6] }}</td>
+            <td>{{ car_rental[7] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Attractions</h2>
+    <table border="1">
+        <tr>
+            <th>Attraction ID</th>
+            <th>Name</th>
+            <th>City</th>
+            <th>Price</th>
+            <th>Rating</th>
+            <th>Company ID</th>
+        </tr>
+        {% for attraction in attractions %}
+        <tr>
+            <td>{{ attraction[0] }}</td>
+            <td>{{ attraction[1] }}</td>
+            <td>{{ attraction[2] }}</td>
+            <td>{{ attraction[3] }}</td>
+            <td>{{ attraction[4] }}</td>
+            <td>{{ attraction[5] }}</td>
+        </tr>
+        {% endfor %}
+    </table> -->
+
+</body>
+</html>

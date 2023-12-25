@@ -48,7 +48,7 @@ def main():
         print(result.stdout)
         resultMap = json.loads(result.stdout)
         if resultMap.get("模拟执行结果"):
-            with open("data/oid.txt", "w") as f:
+            with open("/home/torres/codes/travelAgency/workflow/data/oid.txt", "w") as f:
                 f.write(resultMap["Oid"])
     except Exception as e:
         print(f"Error occurred: {e}")

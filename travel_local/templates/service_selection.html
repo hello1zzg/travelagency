@@ -185,29 +185,28 @@
             </table>
             <div class="button-container">
                 <button type="button" class="submit-button" onclick="window.location.href='/get_services'">返回重选</button>
-                <button type="submit" class="submit-button">提交旅游计划</button>
+                <button type="submit" class="submit-button" >提交旅游计划</button>
             </div>
         </form>
     </div>
-
     <script>
         document.getElementById("travel-plan-form").addEventListener("submit", function(event) {
             event.preventDefault();
-        
+    
             var selectedFlight = document.querySelector('input[name="flight"]:checked').value;
             var selectedRoom = document.querySelector('input[name="room"]:checked').value;
             var selectedCarrental = document.querySelector('input[name="carrental"]:checked').value;
             var selectedAttraction = document.querySelector('input[name="attraction"]:checked').value;
-            var selectedGuide = document.querySelector('input[name="guide"]:checked').value;
-        
+            // var selectedGuide = document.querySelector('input[name="guide"]:checked').value;
+    
             var formData = {
                 "flight": selectedFlight,
                 "room": selectedRoom,
                 "carrental": selectedCarrental,
-                "attraction": selectedAttraction,
-                "guide": selectedGuide
+                "attraction": selectedAttraction
+                // "guide": selectedGuide
             };
-        
+    
             fetch('/submit_travel_plan', {
                 method: 'POST',
                 headers: {
@@ -215,14 +214,19 @@
                 },
                 body: JSON.stringify(formData)
             })
-            .then(response => {
-                if (response.ok) {
+            .then(response => response.json())
+            .then(data => {
+                // 检查服务器的响应内容
+                if (data && data.message === "Travel plan received successfully") {
                     alert("旅游计划提交成功！");
                 } else {
-                    throw new Error('提交失败');
+                    alert("提交失败，请稍后再试");
                 }
             })
-            .catch(error => alert(error.message));
+            .catch(error => {
+                console.error('Error:', error);
+                alert("网络错误或服务器无响应");
+            });
         });
     </script>
 
