@@ -6,6 +6,8 @@ This is the source code for the Microservices course major assignment for the Fa
 
 When using, please open two terminals in the root directory and execute the following commands respectively:
 
+**Please ensure that ports 4396 and 9527 are not in use when using the application.**
+
 ```bash
 python ./travel_local/travel_local.py
 python travel_service/travel_service.py
