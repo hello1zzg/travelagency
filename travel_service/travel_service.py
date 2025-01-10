@@ -53,6 +53,7 @@ def register_original():
     datajsonstr = request.get_data()
     input = json.loads(datajsonstr)
     
+    # 获取传递的参数
     name = input["name"]
     password = input["password"]
     user_type = input["user_type"]
@@ -89,6 +90,8 @@ def register_original():
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
+    
+    # 传递的参数打包成 json
     payload_select = {
         "s-consumerName": "A",
         "headers": {},
@@ -123,6 +126,7 @@ def register_original():
             pd = {"choose": 1}
             bd = {"company_name": name, "password": password, "company_type": user_type}
         
+        # 调用bpmn
         complete_command = [
             "python3", "tool.py", "bpmn", "complete",
             "-ip", ip,
@@ -143,7 +147,6 @@ def register_original():
             print("主要命令执行失败。")
             return "注册失败", 500
 
-
     except requests.exceptions.RequestException as e:
         print(f"API request failed: {e}")
         return "注册服务不可用", 503  # Service Unavailable
@@ -160,6 +163,8 @@ def login_original():
     """
     datajsonstr = request.get_data() # 获取调用参数
     input = json.loads(datajsonstr)
+
+    # 获取传递的参数
     name = input["name"]
     password = input["password"]
     user_type = input["user_type"]
@@ -220,7 +225,7 @@ def login_original():
 
         db_password = data['data'][0]['password']
         if not db_password:
-            return "用户不存在", 404
+            return "用户不存在", 404 # 用户不存在
 
         if password == db_password:
             return "密码正确", 200
@@ -285,6 +290,7 @@ def internal_get_all_services():
     }
 
     data = {}
+
     # 调用不同的POST请求获取数据库信息
     for key, service in services.items():
         payload = {
@@ -318,6 +324,7 @@ def internal_query_all_Attraction_by_CompanyId():
     api_url = "http://10.77.110.222:8999/grafana/runNoCache?loadBalance=enabled"
     headers = {"Accept": "application/json","Content-Type": "application/json"}
     
+    # 传递的参数打包成 json
     payload = {
         "s-consumerName": "A",
         "headers": {},
@@ -759,6 +766,7 @@ def internal_submit_order():
     """
     data = request.get_json()
     
+    # 获取传递的参数
     user_id = data.get("user_id")
     flight_id = data.get("flight_id")
     hotel_id = data.get("hotel_id")
@@ -860,6 +868,8 @@ def internal_submit_travel_info():
     分别查询航班/酒店/租车/景点，对数据进行整合和排序(可使用 BPMN 或直接写逻辑),并返回。
     """
     data = request.get_json()
+    
+    # 获取传递的参数
     departure_date = data.get("departure_date")
     departure_city = data.get("departure_city")
     arrival_city = data.get("arrival_city")
@@ -1170,6 +1180,7 @@ def travel_recommend():
     datajson = request.get_data()
     input = json.loads(datajson)
     
+    # 获取传递的参数
     ticket_result = input["ticket_result"]
     hotel_result = input["hotel_result"]
     car_rental_result = input["car_rental_result"]
@@ -1424,5 +1435,6 @@ def init():
     
     return jsonify({"success": True})
 
+# 启动 Flask
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=9527)
