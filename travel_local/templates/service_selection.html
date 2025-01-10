@@ -1,234 +1,254 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>旅游服务计划选择</title>
-    <style>
-        body {
-            background-image: url('/static/background_select.png');
-            background-size: cover;
-            background-position: center;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-        .header {
-            position: sticky;
-            top: 0;
-            background: white;
-            padding: 10px;
-            z-index: 1000;
-        }
-        .container {
-            width: 60%;
-            max-width: 800px;
-            margin: 0 auto;
-            overflow-y: auto;
-            padding: 20px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            text-align: left;
-            padding: 8px;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-        }
-        .submit-button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            background-color: #5cb85c;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .submit-button:hover {
-            background-color: #4cae4c;
-        }
-        /* 根据需要调整表单样式 */
-        .form-container {
-            padding: 20px;
-        }
-        .button-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px; /* 按钮之间的间隙 */
-        }
-
-        /* 添加媒体查询以处理不同屏幕尺寸的情况 */
-        @media (max-height: 800px) {
-            .container {
-                height: 600px; /* 或者根据需要进行调整 */
-            }
-        }
-    </style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
+	<title>旅游信息管理系统 - 服务选择</title>
+	<style>
+		:root {
+			--white: #ffffff;
+			--gray: #333333;
+			--blue: #0367a6;
+			--lightblue: #008997;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+						Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+		}
+		body {
+			background: #F3F6FB;
+			margin: 60px 0;
+			padding: 0;
+			align-items: center;
+			background-color: var(--white);
+			background: url("{{ url_for('static', filename='background_login.JPG') }}");
+			background-attachment: fixed;
+			background-position: center;
+			background-repeat: no-repeat;
+			background-size: cover;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+		}
+		.container {
+			background-color: rgba(255, 255, 255, 0.9);
+			border-radius: var(--button-radius);
+			box-shadow: 0 2rem 2rem rgba(0, 0, 0, 0.25),
+				0 2rem 2rem rgba(0, 0, 0, 0.22);
+			width: 55%;
+			max-width: 1200px;
+			margin: 50px auto;
+			padding-left: 100px;
+			padding-right: 100px;
+			padding-top: 50px;
+			padding-bottom: 80px;
+			border-radius: 5px;
+		}
+		h1, h2, h3 {
+			text-align: center;
+		}
+		.service-block {
+			margin-bottom: 2rem;
+			border-bottom: 1px solid #ddd;
+			padding-bottom: 2rem;
+		}
+		.service-item {
+			margin: 8px 0;
+		}
+		label {
+			margin-right: 10px;
+		}
+		.no-service {
+			color: #888;
+		}
+		.btn {
+			width: 100%;
+			padding: 10px 20px;
+			background: #007bff;
+			color: #fff;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			color: #fff;
+			border-radius: var(--button-radius);
+			transition: background-color 0.3s ease;
+		}
+		.btn:hover {
+			color: #fff;
+			background: #0056b3;
+		}
+		select {
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			appearance: none;
+			padding: 8px;
+			border: 1px solid #999;
+			border-radius: 5px;
+			background-color: #f1f1f1;
+			color: #333;
+			font-size: 16px;
+			width: 100%;
+		}
+		select:after {
+			content: "\25BC";
+			position: absolute;
+			top: 12px;
+			right: 10px;
+		}
+		option {
+			padding: 5px;
+			background-color: #f9f9f9;
+			color: #333;
+		}
+		.back_button {
+			position: fixed;
+			top: 20px;
+			left: 20px;
+			background: transparent;
+			border-width: 0px;
+			outline: 0;
+			width: 70px;
+			height: 60px;
+			border: none;
+			cursor: pointer;
+			z-index: 999;
+		}
+		.back_button img {
+			width: 100%;
+			height: 100%;
+			outline: 0;
+		}
+		.back-button.active.focus,
+		.back-button.active:focus,.back-button.focus,
+		.back-button:active.focus,.back-button:active:focus,
+		.back-button:focus{ outline:0; }
+	</style>
+  
 </head>
 <body>
-    <div class="container">
-        <h2>机票购买</h2>
-        <form id="travel-plan-form">
-            <table>
-                <tr>
-                    <th>选择</th>
-                    <th>航班号</th>
-                    <th>出发城市</th>
-                    <th>到达城市</th>
-                    <th>出发时间</th>
-                    <th>价格</th>
-                    <th>航空公司</th>
-                </tr>
-                {% for flight in form_data.flights %}
-                <tr>
-                    <td><input type="radio" name="flight" value="{{ flight.flight_id }}" {% if loop.first %}checked{% endif %}></td>
-                    <td>{{ flight.flight_id }}</td>
-                    <td>{{ flight.departure_city }}</td>
-                    <td>{{ flight.arrival_city }}</td>
-                    <td>{{ flight.departure_time }}</td>
-                    <td>{{ flight.price }}</td>
-                    <td>{{ flight.airline }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-
-            <h2>酒店预订</h2>
-            <table>
-                <tr>
-                    <th>选择</th>
-                    <th>房间号</th>
-                    <th>房型</th>
-                    <th>价格</th>
-                </tr>
-                {% for hotel in form_data.hotels %}
-                <tr>
-                    <td><input type="radio" name="room" value="{{ hotel.room_id }}" {% if loop.first %}checked{% endif %}></td>
-                    <td>{{ hotel.room_number }}</td>
-                    <td>{{ hotel.room_type }}</td>
-                    <td>{{ hotel.price }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-
-            <h2>租车服务</h2>
-            <table>
-                <tr>
-                    <th>选择</th>
-                    <th>车型</th>
-                    <th>变速箱类型</th>
-                    <th>租车地点</th>
-                    <th>还车地点</th>
-                </tr>
-                {% for rental in form_data.car_rentals %}
-                <tr>
-                    <td><input type="radio" name="carrental" value="{{ rental.carrental_id }}" {% if loop.first %}checked{% endif %}></td>
-                    <td>{{ rental.car_type }}</td>
-                    <td>{{ rental.transmission_type }}</td>
-                    <td>{{ rental.rental_location }}</td>
-                    <td>{{ rental.return_location }}</td>
-                </tr>
-            {% endfor %}
-            </table>
-
-            <h2>景点选择</h2>
-            <table>
-                <tr>
-                    <th>选择</th>
-                    <th>景点名称</th>
-                    <th>城市</th>
-                </tr>
-                {% for attraction in form_data.attractions %}
-                <tr>
-                    <td><input type="radio" name="attraction" value="{{ attraction.attraction_id }}" {% if loop.first %}checked{% endif %}></td>
-                    <td>{{ attraction.attraction_name }}</td>
-                    <td>{{ attraction.city }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-
-            <h2>导游选择</h2>
-            <table>
-                <tr>
-                    <th>选择</th>
-                    <th>导游姓名</th>
-                    <th>电话</th>
-                </tr>
-                {% for guide in form_data.guides %}
-                <tr>
-                    <td><input type="radio" name="guide" value="{{ guide.guide_id }}" {% if loop.first %}checked{% endif %}></td>
-                    <td>{{ guide.guide_name }}</td>
-                    <td>{{ guide.guide_phone }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-            <div class="button-container">
-                <button type="button" class="submit-button" onclick="window.location.href='/get_services'">返回重选</button>
-                <button type="submit" class="submit-button" >提交旅游计划</button>
-            </div>
-        </form>
+  	<div class="container">
+    
+    <h1 style="color: var(--blue);">旅游服务选择</h1>
+    
+    <div style="margin-left:auto; margin-right:auto; margin-top:5px; width:230px; color:grey; border: 0; border-top: 2px solid #d0d0d5;"></div>
+  
+    <p style="margin-top: 20px;">本旅游信息服务管理系统已经根据您的需求，为您智能推荐了以下连锁服务。请选择想要购买的服务项目，不购买的项请选择“无”或“不购买”。选择完毕后点击“提交订单”，系统将提交您的旅游订单。祝您旅行愉快，出行平安！</p>
+    
+    <!-- 航班选择 -->
+    <div class="service-block">
+		<h2>推荐航班</h2>
+		{% if form_data['flights'] %}
+			<select class="form-control" id="flight_select">
+			<option value="">-- 不购买航班 --</option>
+			{% for flight in form_data['flights'] %}
+				<!-- flight: (flight_id, departure_city, arrival_city, departure_time, price, company_name, rating) -->
+				<option value="{{ flight[0] }}">
+					{{ flight[0] }}号航班 [{{ flight[1] }}->{{ flight[2] }}], 时间:{{ flight[3] }}, ￥{{ flight[4] }}, (评分:{{ flight[5] }})
+				</option>
+			{% endfor %}
+			</select>
+		{% else %}
+			<p class="no-service">暂无可用航班</p>
+		{% endif %}
     </div>
-    <script>
-        document.getElementById("travel-plan-form").addEventListener("submit", function(event) {
-            event.preventDefault();
-    
-            var selectedFlight = document.querySelector('input[name="flight"]:checked').value;
-            var selectedRoom = document.querySelector('input[name="room"]:checked').value;
-            var selectedCarrental = document.querySelector('input[name="carrental"]:checked').value;
-            var selectedAttraction = document.querySelector('input[name="attraction"]:checked').value;
-            // var selectedGuide = document.querySelector('input[name="guide"]:checked').value;
-    
-            var formData = {
-                "flight": selectedFlight,
-                "room": selectedRoom,
-                "carrental": selectedCarrental,
-                "attraction": selectedAttraction
-                // "guide": selectedGuide
-            };
-    
-            fetch('/submit_travel_plan', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                // 检查服务器的响应内容
-                if (data && data.message === "Travel plan received successfully") {
-                    alert("旅游计划提交成功！");
-                } else {
-                    alert("提交失败，请稍后再试");
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("网络错误或服务器无响应");
-            });
-        });
-    </script>
 
+    <!-- 酒店选择 -->
+		<div class="service-block">
+			<h2>推荐酒店</h2>
+			{% if form_data['hotels'] %}
+				<select class="form-control" id="hotel_select">
+				<option value="">-- 不预订酒店 --</option>
+					{% for hotel in form_data['hotels'] %}
+					<!-- hotel: (room_id, room_number, room_type, room_price, rating, hotel_name) -->
+					<option value="{{ hotel[0] }}">
+						房间ID:{{ hotel[0] }} [{{ hotel[2] }}], ￥{{ hotel[3] }}, 酒店:{{ hotel[5] }} (评分:{{ hotel[4] }})
+					</option>
+					{% endfor %}
+				</select>
+			{% else %}
+				<p class="no-service">暂无可用酒店</p>
+			{% endif %}
+		</div>
+    
+		<!-- 租车选择 -->
+		<div class="service-block">
+			<h2>租车选项</h2>
+			{% if form_data['car_rentals'] %}
+				<select class="form-control" id="car_select">
+				<option value="">-- 不租车 --</option>
+					{% for car in form_data['car_rentals'] %}
+					<!-- car: (carrental_id, car_type, transmission_type, rental_location, return_location, price, rating, company_name) -->
+					<option value="{{ car[0] }}">
+						车辆ID:{{ car[0] }} {{ car[1] }}-{{ car[2] }}, 取/还:{{ car[3] }}/{{ car[4] }}, ￥{{ car[5] }}, (评分:{{ car[6] }}), {{ car[7] }}
+					</option>
+					{% endfor %}
+				</select>
+			{% else %}
+				<p class="no-service">暂无可用租车</p>
+			{% endif %}
+		</div>
+
+    	<!-- 景点选择 -->
+		<div class="service-block">
+			<h2>景点门票</h2>
+			{% if form_data['attractions'] %}
+				<select class="form-control" id="attraction_select">
+				<option value="">-- 不购买门票 --</option>
+					{% for att in form_data['attractions'] %}
+					<!-- att: (attraction_id, attraction_name, city, price, rating) -->
+					<option value="{{ att[0] }}">
+						景点ID:{{ att[0] }} {{ att[1] }} ({{ att[2] }}), ￥{{ att[3] }}, 评分:{{ att[4] }}
+					</option>
+					{% endfor %}
+				</select>
+			{% else %}
+				<p class="no-service">暂无可用景点</p>
+			{% endif %}
+		</div>
+
+    	<button class="btn" onclick="submitOrder()">提交订单</button>
+  	</div>
+  	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" ></script>
+	<script>
+		function submitOrder() {
+			// 收集选择的flight_id, hotel_id, car_id, attraction_id
+			const flightId = document.getElementById('flight_select') ? document.getElementById('flight_select').value : '';
+			const hotelId = document.getElementById('hotel_select') ? document.getElementById('hotel_select').value : '';
+			const carId = document.getElementById('car_select') ? document.getElementById('car_select').value : '';
+			const attractionId = document.getElementById('attraction_select') ? document.getElementById('attraction_select').value : '';
+			
+			const payload = {
+				flight_id: flightId || null,
+				hotel_id: hotelId || null,
+				carrental_id: carId || null,
+				attraction_id: attractionId || null
+			};
+			
+			// 通过fetch或Ajax提交到后端
+			fetch("/submit_order", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(payload)
+			})
+			.then(resp => resp.json())
+			.then(data => {
+				if(data.success) {
+					window.location.href = "/rate_services";
+				} else {
+					alert("订单提交失败，请检查：" + data.message);
+				}
+			})
+			.catch(err => {
+				alert("网络异常，订单提交失败");
+				console.error(err);
+			});
+		}
+	</script>
+	<script>
+		function back_to_home() {
+		window.location.href = "/login";
+	}
+	</script>
 </body>
 </html>

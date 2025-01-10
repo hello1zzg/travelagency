@@ -1,132 +1,889 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Dashboard</title>
+    <title>旅游信息管理系统 - 管理员后台</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" 
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" 
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <style>
+        :root {
+            --white: #ffffff;
+            --gray: #333333;
+            --blue: #0367a6;
+            --lightblue: #008997;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+                        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        }
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        form{
+            margin-top: 15px;
+        }
+        h2{
+            margin-top: 40px;
+        }
+        h3{
+            margin-top: 15px;
+        }
+        a{
+            list-style: none;
+        }
+        li{
+            list-style: none;
+        }
+        .lunbo{
+            width: 100%;
+        }
+        .content{
+            width: 800px;
+            height: 10000px;
+            margin: 20px auto;
+            position: relative;
+        }
+        #item{
+            width: 100%;
+            height: 100%;
+            
+        }
+        .item{
+            position: absolute;
+            opacity: 0;
+            transition: all 1s;
+            
+        }
+        .item.active{
+            opacity:1;
+        }
+        img{
+            width: 100%;
+        }
+        #btn-left{
+            width: 30px;
+            height: 69px;
+            font-size: 30px;
+            color: white;
+            background-color:rgba(0,0,0,0.4);
+            line-height: 69px;
+            padding-left:5px;
+            z-index: 10;/*始终显示在图片的上层*/
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-60%);/*使按钮向上偏移居中对齐*/
+            cursor: pointer;
+            opacity: 0;/*平时隐藏*/
+        }
+        .lunbo:hover #btn-left{
+            /*鼠标滑入，显示图标*/
+            opacity: 1;
+        }
+        /* 额外样式用于显示闪现消息 */
+        .flash-message-container {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			z-index: 9999;
+			width: 80%;
+			max-width: 500px;
+        }
+        .alert {
+			width: 100%;
+			margin-bottom: 1rem;
+			text-align: center;
+        }
+        #btn-right{
+            width: 26px;
+            height: 69px;
+            font-size: 30px;
+            color: white;
+            background-color:rgba(0,0,0,0.4);
+            line-height: 69px;
+            padding-left: 5px;
+            z-index: 10;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(-60%);
+        }
+        .lunbo:hover #btn-right{
+            opacity: 1;
+        }
+        #circle{
+            height: 20px;
+            display: flex;
+            position: absolute;
+            bottom: 35px;
+            right: 25px;
+        }
+        .circle{
+            width: 10px;
+            height: 10px;
+            border-radius: 10px;
+            border: 2px solid white;
+            background: rgba(0,0,0,0.4);
+            cursor: pointer;
+            margin: 5px;
+        }
+        .white{
+            background-color: #FFFFFF;
+        }
+        input [type="date"] {
+            /* 可以修改字体大小、颜色、边框、背景色等 */
+            font-size: 16px;
+            border-radius:4px;
+            background-color:white;
+            color:#333;
+            padding:8px 12px;
+            border:1px solid #ccc;
+        }
+        input[type="date"]:focus {
+            outline:none; /* 避免默认焦点样式 */ 
+            box-shadow:0 0 5px rgba(0,0,0,0.3);
+        }
+
+        /* 针对手机的样式 */
+        @media screen and (max-width: 40rem) {
+            #right-sidebar-box {
+                display: none;
+            }
+        }
+        /* 针对电脑的样式 */
+        @media screen and (min-width: 40rem) {
+            #right-sidebar-box {
+                position: fixed;
+                width: 2rem;
+                right: 0;
+                top: calc(50vh - 5rem);
+            }
+            
+            #rsb-ul {
+                border-radius: 10px 0 0 10px;
+                background: var(--color-content-bg);
+                padding: 4px 0;
+            }
+            #rsb-ul li {
+                position: relative;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 2rem;
+            }
+            
+            #rsb-ul li a {
+                position: absolute;
+                color: #888;
+                z-index: 9;
+                transition: all 0.3s ease-in-out;
+            }
+            #rsb-ul li span {
+                position: absolute;
+                transform: translateX(100%);
+                width: 6.6rem;
+                height: 1.8rem;
+                color: #fff;
+                border-radius: 1rem 0 0 1rem;
+                padding: 0 0.9rem;
+                padding-top: 2px;
+                display: flex;
+                justify-content: left;
+                align-items: center;
+                z-index: 3;
+                transition: transform 0.3s ease-in-out;
+                cursor:url(/asset/cursor/hand1.cur), auto !important;
+            }
+            #rsb-ul li:hover a {
+                color: #fff;
+            }
+            #rsb-ul li:hover span {
+                transform: translateX(calc(-2rem + 10px));
+                background-color: var(--color-primary);
+            }
+        }
+
+
+        .travel-form {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding-top: 60px;
+            padding-left: 100px;
+            padding-right: 100px;
+            padding-bottom: 60px;
+            width: 90%;
+            max-width: 1100px;
+            /* margin-top: 100px; */
+            /* margin-bottom: 100px; */
+            margin: auto;
+            /* height:3000px; */
+        }
+
+        body {
+            margin: 80px 0;
+            align-items: center;
+            background-color: var(--white);
+            /* background: url("/static/background_login.png"); */
+            background: url("/static/background_login.JPG");
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: grid;
+            /* height: 610vh; */
+            place-items: center;
+            flex-direction: column; /* Ensure content stacks vertically */
+            /* padding-top: 100px;
+            padding-bottom: 100px; */
+        }
+
+        /* Flash message styling */
+        .flash-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 0, 0, 0.8); /* Red background for errors */
+            color: white;
+            padding: 20px 40px;
+            border-radius: 5px;
+            z-index: 1000;
+            display: none; /* Hidden by default */
+            font-size: 1.2em;
+        }
+
+        /* Success message styling */
+        .flash-message.success {
+            background-color: rgba(0, 128, 0, 0.8); /* Green background for success */
+        }
+        
+        table thead, table tr {
+            border-top-width: 1px;
+            border-top-style: solid;
+            border-top-color: rgb(183, 202, 227);
+        }
+        table {
+            margin-top: 20px;
+            min-width: 400px;
+            text-align: center;
+            rules: "rows";
+            border-left: 0;
+            border-right: 0;
+            border-top-width: 1px;
+            border-top-color: rgb(183, 202, 227);
+            border-spacing: 1px;
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+            border-bottom-color: rgb(183, 202, 227);
+        }
+        /* Padding and font style */
+        table td, table th {
+            border: none;
+            padding: 5px 10px;
+            font-size: 14px;
+            font-family: Verdana;
+            color: rgb(95, 126, 186);
+        }
+        /* Alternating background colors */
+        table tr:nth-child(even) {
+            background: rgb(221, 223, 237)
+        }
+        table tr:nth-child(odd) {
+            background: #FFF
+        }
+
+        input {
+            /* max-width: 250px; */
+            width: 12%;
+            padding: 8px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 2px 2px 7px 0 rgb(0, 0, 0, 0.2);
+            outline: none;
+            color: dimgray;
+        }
+
+        input:invalid {
+            animation: justshake 0.3s forwards;
+            caret-color: lightblue;
+        }
+
+        @keyframes justshake {
+            25% { transform: translateX(5px); }
+            50% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+            100% { transform: translateX-(5px); }
+        }
+        
+        button {
+            margin-left: 10px;
+        }
+
+        .btn,
+		.btn:focus,
+		.btn:hover {
+			background-color: rgb(120, 205, 255);
+			position: relative;
+			min-width: 100px;
+            height: 40px;
+			border: 0px;
+			/* border: 1px solid rgb(113, 196, 255); */
+			color: #FFFFFF;
+			font-size: 1rem;
+			font-weight: bold;
+			text-align: center;
+			text-decoration: none;
+			text-transform: uppercase;
+			-webkit-font-smoothing: antialiased;
+			/* padding: 5px 5px; */
+		}
+		.btn:hover {
+			cursor: pointer;
+		}
+		.btn span:nth-child(1),
+		.btn span:nth-child(2),
+		.btn span:nth-child(3),
+		.btn span:nth-child(4) {
+			content: "";
+			display: block;
+			position: absolute;
+			background-color: rgb(33, 150, 243);
+		}
+		.btn span:nth-child(1) {
+			width: 2px;
+			left: 0;
+			bottom: 0;
+		}
+		.btn span:nth-child(2) {
+			height: 2px;
+			left: 0;
+			top: 0;
+		}
+		.btn span:nth-child(3) {
+			width: 2px;
+			right: 0;
+			top: 0;
+		}
+		.btn span:nth-child(4) {
+			height: 2px;
+			right: 0;
+			bottom: 0;
+		}
+		.btn:hover {
+			border: none;
+		}
+		.btn:hover span:nth-child(1) {
+			animation: move1 1500ms infinite ease;
+		}
+		.btn:hover span:nth-child(2) {
+			animation: move2 1500ms infinite ease;
+		}
+		.btn:hover span:nth-child(3) {
+			animation: move3 1500ms infinite ease;
+		}
+		.btn:hover span:nth-child(4) {
+			animation: move4 1500ms infinite ease;
+		}
+		@keyframes move1 {
+			0% { height: 100%; bottom: 0; }
+			54% { height: 0; bottom: 100%; }
+			55% { height: 0; bottom: 0; }
+			100% { height: 100%; bottom: 0; }
+		}
+		@keyframes move2 {
+			0% { width: 0; left: 0; }
+			50% { width: 100%; left: 0; }
+			100% { width: 0; left: 100%; }
+		}
+		@keyframes move3 {
+			0% { height: 100%; top: 0; }
+			54% { height: 0; top: 100%; }
+			55% { height: 0; top: 0; }
+			100% { height: 100%; top: 0; }
+		}
+		@keyframes move4 {
+			0% { width: 0; right: 0; }
+			55% { width: 100%; right: 0; }
+			100% { width: 0; right: 100%; }
+		}
+        /* 隐藏原生的select样式 */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding: 9px;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 2px 2px 7px 0 rgb(0, 0, 0, 0.2);
+            outline: none;
+            background-color: #ffffff;
+            color: #333;
+            color: dimgray;
+            font-size: 13px;
+            width: 120px;
+        }
+ 
+        /* 美化select的下拉箭头 */
+        select:after {
+            content: "\25BC"; /* Unicode编码，表示向下的箭头 */
+            position: absolute;
+            top: 12px;
+            right: 10px;
+        }
+ 
+        /* 美化选项内容 */
+        option {
+            border: none;
+            border-radius: 5px;
+            box-shadow: 2px 2px 7px 0 rgb(0, 0, 0, 0.2);
+            outline: none;
+            padding: 5px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h3 {
+            margin-top: 20px;
+        }
+        h4 {
+            margin-top: 20px;
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: transparent;
+            border-width: 0px;
+            outline: none;
+            width: 60px;
+            height: 60px;
+            border: none;
+            cursor: pointer;
+            z-index: 999;
+        }
+        img{
+            outline:none;
+        }
+        .back-button.active.focus,
+        .back-button.active:focus,.back-button.focus,
+        .back-button:active.focus,.back-button:active:focus,
+        .back-button:focus{ outline:none; }
+    </style>
 </head>
 <body>
-    <h1>Admin Dashboard</h1>
-
-    <h2>Tickets</h2>
-
-    <h2>Add Ticket</h2>
-    <form action="{{ url_for('add_ticket') }}" method="post">
-        <input type="number" name="flight_id" placeholder="Flight ID" required>
-        <input type="text" name="departure_city" placeholder="Departure City" required>
-        <input type="text" name="arrival_city" placeholder="Arrival City" required>
-        <input type="date" name="departure_time" required>
-        <input type="number" name="price" placeholder="Price" required>
-        <input type="number" step="0.1" name="rating" placeholder="Rating" required>
-        <button type="submit">Add Ticket</button>
-    </form>
-
-
-    <!-- 删除 Ticket 的表单 -->
-    <h2>Delete Ticket</h2>
-    <form action="{{ url_for('delete_ticket') }}" method="post">
-        <input type="number" name="ticket_id" placeholder="Ticket ID" required>
-        <button type="submit">Delete Ticket</button>
-    </form>
-
-    <!-- 更新 Ticket 的表单 -->
-    <h2>Update Ticket</h2>
-    <form action="{{ url_for('update_ticket') }}" method="post">
-        <input type="number" name="flight_id" placeholder="Ticket ID" required>
-        <input type="text" name="departure_city" placeholder="New Departure City">
-        <input type="text" name="arrival_city" placeholder="New Arrival City">
-        <input type="date" name="departure_time">
-        <input type="number" name="price" placeholder="New Price">
-        <input type="number" step="0.1" name="rating" placeholder="New Rating">
-        <button type="submit">Update Ticket</button>
-    </form>
     
-    <table border="1">
-        <tr>
-            <th>Flight ID</th>
-            <th>Departure City</th>
-            <th>Arrival City</th>
-            <th>Departure Date</th>
-            <th>Price</th>
-            <th>Rating</th>
-        </tr>
-        {% for ticket in tickets %}
-        <tr>
-            <td>{{ ticket[0] }}</td>
-            <td>{{ ticket[1] }}</td>
-            <td>{{ ticket[2] }}</td>
-            <td>{{ ticket[3] }}</td>
-            <td>{{ ticket[4] }}</td>
-            <td>{{ ticket[5] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <!-- Flash Message Container -->
+    <div class="flash-message-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category == "success" %}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% elif category == "warning" %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% else %}
+                        <!-- 其它默认为错误提示，或可根据需要自行分类 -->
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 等页面完全加载后再执行
+            setTimeout(function(){
+                // 选中所有具有 .alert 类的元素
+                const alerts = document.querySelectorAll('.alert');
+                // 遍历并移除它们
+                alerts.forEach(function(alert) {
+                    alert.remove();
+                });
+            }, 1000); // 3秒后自动执行
+        });
+        </script>
 
-    <!-- <h2>Hotels</h2>
-    <table border="1">
-        <tr>
-            <th>Hotel ID</th>
-            <th>Hotel Name</th>
-            <th>City</th>
-            <th>Rating</th>
-            <th>Room Count</th>
-        </tr>
-        {% for hotel in hotels %}
-        <tr>
-            <td>{{ hotel[0] }}</td>
-            <td>{{ hotel[1] }}</td>
-            <td>{{ hotel[2] }}</td>
-            <td>{{ hotel[3] }}</td>
-            <td>{{ hotel[4] }}</td>
-        </tr>
-        {% endfor %}
-    </table> -->
+    <button class="back-button" onclick="back_to_home()">
+        <img src="/static/back.png" alt="back">
+    </button>
 
-    <!-- <h2>Car Rentals</h2>
-    <table border="1">
-        <tr>
-            <th>Car ID</th>
-            <th>Type</th>
-            <th>Transmission</th>
-            <th>Rental Location</th>
-            <th>Return Location</th>
-            <th>Price</th>
-            <th>Rating</th>
-            <th>Company ID</th>
-        </tr>
-        {% for car_rental in car_rentals %}
-        <tr>
-            <td>{{ car_rental[0] }}</td>
-            <td>{{ car_rental[1] }}</td>
-            <td>{{ car_rental[2] }}</td>
-            <td>{{ car_rental[3] }}</td>
-            <td>{{ car_rental[4] }}</td>
-            <td>{{ car_rental[5] }}</td>
-            <td>{{ car_rental[6] }}</td>
-            <td>{{ car_rental[7] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="travel-form">
+        <h1 style="text-align: center; color: var(--blue);">管理员后台</h1>
+        
+        <div style="margin-left:auto; margin-right:auto; margin-top:5px; width:200px; color:grey; border: 0; border-top: 2px solid #d0d0d5;"></div>
 
-    <h2>Attractions</h2>
-    <table border="1">
-        <tr>
-            <th>Attraction ID</th>
-            <th>Name</th>
-            <th>City</th>
-            <th>Price</th>
-            <th>Rating</th>
-            <th>Company ID</th>
-        </tr>
-        {% for attraction in attractions %}
-        <tr>
-            <td>{{ attraction[0] }}</td>
-            <td>{{ attraction[1] }}</td>
-            <td>{{ attraction[2] }}</td>
-            <td>{{ attraction[3] }}</td>
-            <td>{{ attraction[4] }}</td>
-            <td>{{ attraction[5] }}</td>
-        </tr>
-        {% endfor %}
-    </table> -->
+        <h3>一、用户服务</h3>
+        
+        <h4>1、添加用户</h4>
+        <form action="{{ url_for('add_user') }}" method="post">
+            <input type="text" name="nm" placeholder="用户名" required/>
+            <input type="password" name="pd" placeholder="密码" required/>
+            <input type="text" name="user_role" list="typelist" placeholder="请选择" class="input" required/>
+            <datalist id="typelist">
+                <option>普通用户</option>
+                <option>管理员</option>
+            </datalist>
+            <button type="submit" class="btn">添加用户<span></span><span></span><span></span><span></span></button>
+        </form>
 
+        <h4>2、删除用户</h4>
+        <form action="{{ url_for('delete_user') }}" method="post">
+            <input type="text" name="name_delete" placeholder="用户名" required/>
+            <button type="submit" class="btn">删除用户<span></span><span></span><span></span><span></span></button>
+        </form>
+        
+        <h4>3、更改用户权限</h4>
+        <form action="{{ url_for('update_user') }}" method="post">
+            <input type="text" name="update_user_nm" placeholder="用户名" required/>
+            <!-- <select id="group2" name="right" value="1">
+                <option value="1">普通用户</companyon>
+                <option value="2">管理员</option>
+            </select> -->
+            <input type="text" name="user_role" list="typelist" placeholder="请选择" class="input" required/>
+            <datalist id="typelist">
+                <option>普通用户</option>
+                <option>管理员</option>
+            </datalist>
+            <button type="submit" class="btn">更改权限<span></span><span></span><span></span><span></span></button>
+        </form>
+        
+        <h4>用户信息表</h4>
+        <table style="margin-top: 20px;" border="1">
+            <tr>
+                <th>用户ID</th>
+                <th>用户名</th>
+                <th>密码</th>
+                <th>用户权限</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{ user[0] }}</td>
+                <td>{{ user[1] }}</td>
+                <td>{{ user[2] }}</td>
+                <td>{{ user[3] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div style="margin-top:50px; width:100%; color:grey; border: 0;border-top: 2px solid #d0d0d5;"></div>
+
+        <h3>二、企业服务</h3>
+
+        <h4>1、添加企业</h4>
+        <form action="{{ url_for('add_company') }}" method="post">
+            <input type="text" name="company_nm" placeholder="企业名" required/>
+            <input type="password" name="company_pd" placeholder="密码" required/>
+            <select id="group1" name="company_type" value="1">
+                <option>航空公司</option>
+                <option>酒店</option>
+                <option>租车公司</option>
+                <option>旅游景点</option>
+            </select>
+            <button type="submit" class="btn">添加用户<span></span><span></span><span></span><span></span></button>
+        </form>
+
+        <h4>2、删除企业</h4>
+        <form action="{{ url_for('delete_company') }}" method="post">
+            <input type="text" name="company_delete_nm" placeholder="用户名" required/>
+            <button type="submit" class="btn">删除用户<span></span><span></span><span></span><span></span></button>
+        </form>
+
+        <h4>3、更改用户类型</h4>
+        <form action="{{ url_for('update_company') }}" method="post">
+            <input type="text" name="company_name" placeholder="用户名" required/>
+            <select id="group2" name="company_type" value="1">
+                <option>航空公司</option>
+                <option>酒店</option>
+                <option>租车公司</option>
+                <option>旅游景点</option>
+                <!-- <option value="1">普通用户</option>
+                <option value="2">管理员</option> -->
+            </select>
+            <button type="submit" class="btn">更改权限<span></span><span></span><span></span><span></span></button>
+        </form>
+        
+        <h4>4、企业信息表</h4>
+        <table border="1">
+            <tr>
+                <th>企业ID</th>
+                <th>企业名</th>
+                <th>密码</th>
+                <th>企业类型</th>
+            </tr>
+            {% for company in companies %}
+            <tr>
+                <td>{{ company[0] }}</td>
+                <td>{{ company[1] }}</td>
+                <td>{{ company[3] }}</td>
+                <td>{{ company[2] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        
+        <div style="margin-top:50px; width:100%; color:grey; border: 0;border-top: 2px solid #d0d0d5;"></div>
+
+        <h3 style="margin-top: 50px;">三、航班信息服务</h3>
+
+        <h4>1、增加航班</h4>
+        <form action="{{ url_for('add_ticket') }}" method="post">
+            <input type="number" name="flight_id" placeholder="航班号" required/>
+            <input type="text" name="departure_city" placeholder="始发城市" required/>
+            <input type="text" name="arrival_city" placeholder="到达城市" required/>
+            <input type="date" name="departure_time" required>
+            <input type="number" name="price" placeholder="价格" required/>
+            <input type="number" step="0.1" name="rating" placeholder="评分" required/>
+            <button type="submit" class="btn">增加航班<span></span><span></span><span></span><span></span></button>
+        </form>
+
+        <!-- 删除 Ticket 的表单 -->
+        <h4>2、删除航班</h4>
+        <form action="{{ url_for('delete_ticket') }}" method="post">
+            <input type="number" name="ticket_id" placeholder="航班ID" required/>
+            <button type="submit" class="btn">删除航班<span></span><span></span><span></span><span></span></button>
+        </form>
+
+        <!-- 更新 Ticket 的表单 -->
+        <h4>3、更改航班信息</h4>
+        <form action="{{ url_for('update_ticket') }}" method="post">
+            <input type="number" name="flight_id" placeholder="航班号" required/>
+            <input type="text" name="departure_city" placeholder="始发城市" required/>
+            <input type="text" name="arrival_city" placeholder="到达城市" required/>
+            <input type="date" name="departure_time" required/>
+            <input type="number" name="price" placeholder="价格" required/>
+            <input type="number" step="0.1" name="rating" placeholder="评分" required/>
+            <button type="submit" class="btn">更改航班<span></span><span></span><span></span><span></span></button>
+        </form>
+        <h4>航班信息</h4>
+        <table border="1">
+            <tr>
+                <th>航班号</th>
+                <th>始发城市</th>
+                <th>始发城市</th>
+                <th>出发时间</th>
+                <th>价格</th>
+                <th>评分</th>
+                <th>航空公司ID</th>
+            </tr>
+            {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket[0] }}</td>
+                <td>{{ ticket[1] }}</td>
+                <td>{{ ticket[2] }}</td>
+                <td>{{ ticket[3] }}</td>
+                <td>{{ ticket[4] }}</td>
+                <td>{{ ticket[5] }}</td>
+                <td>{{ ticket[6] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div style="margin-top:50px; width:100%; color:grey; border: 0;border-top: 2px solid #d0d0d5;"></div>
+
+        <h3 style="margin-top: 50px;">四、酒店信息服务</h3>
+
+        <h4>1、增加酒店</h4>
+        <form action="{{ url_for('add_hotel') }}" method="post">
+            <input type="text" name="hotel_id" placeholder="公司ID" required/>
+            <input type="text" name="hotel_name" placeholder="酒店名" required/>
+            <input type="text" name="city" placeholder="城市" required/>
+            <input type="number" step="0.1" name="rating" placeholder="评分" required/>
+            <button type="submit" class="btn">增加酒店<span></span><span></span><span></span><span></span></button>
+        </form>
+        
+        <h4>2、修改酒店信息</h4>
+        <form action="{{ url_for('update_hotel') }}" method="post">
+            <input type="text" name="hotel_id" placeholder="酒店ID" required/>
+            <input type="text" name="company_id" placeholder="公司ID" required/>
+            <input type="text" name="hotel_name" placeholder="酒店名" required/>
+            <input type="text" name="city" placeholder="城市" required/>
+            \<input type="number" step="0.1" name="rating" placeholder="评分" required/>
+            <button type="submit" class="btn">修改酒店<span></span><span></span><span></span><span></span></button>
+        </form>
+
+        <h4>3、删除酒店</h4>
+        <form action="{{ url_for('delete_hotel') }}" method="post">
+            <input type="number" name="hotel_id" placeholder="酒店ID" required/>
+            <button type="submit" class="btn">删除酒店<span></span><span></span><span></span><span></span></button>
+        </form>
+
+        <h4>酒店信息</h4>
+        <table border="1">
+            <tr>
+                <th>酒店id</th>
+                <th>酒店名</th>
+                <th>城市</th>
+                <th>评分</th>
+                <th>公司id</th>
+            </tr>
+            {% for hotel in hotels %}
+            <tr>
+                <td>{{ hotel[0] }}</td>
+                <td>{{ hotel[1] }}</td>
+                <td>{{ hotel[2] }}</td>
+                <td>{{ hotel[3] }}</td>
+                <td>{{ hotel[4] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div style="margin-top:50px; width:100%; color:grey; border: 0;border-top: 2px solid #d0d0d5;"></div>
+
+        <h3 style="margin-top: 50px;">五、租车信息服务</h3>
+
+        <h4>1、增加租车信息</h4>
+        <form action="{{ url_for('add_ticket') }}" method="post">
+            <input type="text" name="departure_city" placeholder="车辆型号" required/>
+            <input type="text" name="departure_city" placeholder="操作模式" required/>
+            <input type="number" name="price" placeholder="租车地" required/>
+            <input type="number" name="price" placeholder="还车地" required/>
+            <input type="number" step="0.1" name="rating" placeholder="价格" required/>
+            <input type="number" step="0.1" name="rating" placeholder="评分" required/>
+            <input type="number" step="0.1" name="rating" placeholder="租车公司" required/>
+            <button style="margin-top: 10px;" type="submit" class="btn">增加租车信息<span></span><span></span><span></span><span></span></button>
+        </form>
+
+        <h4>2、更改租车信息</h4>
+        <form action="{{ url_for('add_ticket') }}" method="post">
+            <input type="text" name="departure_city" placeholder="车辆ID" required/>
+            <input type="text" name="departure_city" placeholder="车辆型号" required/>
+            <input type="text" name="departure_city" placeholder="操作模式" required/>
+            <input type="number" name="price" placeholder="租车地" required/>
+            <input type="number" name="price" placeholder="还车地" required/>
+            <input type="number" step="0.1" name="rating" placeholder="价格" required/>
+            <input type="number" step="0.1" name="rating" placeholder="评分" required/>
+            <input type="number" step="0.1" name="rating" placeholder="租车公司" required/>
+            <button style="margin-top: 10px;" type="submit" class="btn">增加租车信息<span></span><span></span><span></span><span></span></button>
+        </form>
+
+        <h4>3、删除租车信息</h4>
+        <form action="{{ url_for('delete_ticket') }}" method="post">
+            <input type="number" name="ticket_id" placeholder="租车信息ID" required/>
+            <button type="submit" class="btn">删除车辆<span></span><span></span><span></span><span></span></button>
+        </form>
+
+        <h4>车辆信息</h4>
+        <table border="1">
+            <tr>
+                <th>车辆ID</th>
+                <th>型号</th>
+                <th>操作模式</th>
+                <th>租车点</th>
+                <th>还车点</th>
+                <th>价格</th>
+                <th>评分</th>
+                <th>公司 ID</th>
+            </tr>
+            {% for car_rental in car_rentals %}
+            <tr>
+                <td>{{ car_rental[0] }}</td>
+                <td>{{ car_rental[1] }}</td>
+                <td>{{ car_rental[2] }}</td>
+                <td>{{ car_rental[3] }}</td>
+                <td>{{ car_rental[4] }}</td>
+                <td>{{ car_rental[5] }}</td>
+                <td>{{ car_rental[6] }}</td>
+                <td>{{ car_rental[7] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div style="margin-top:50px; width:100%; color:grey; border: 0;border-top: 2px solid #d0d0d5;"></div>
+
+        <h3 style="margin-top: 50px;">六、景点信息服务</h3>
+        
+        <h4>1、增加景点信息</h4>
+        <form action="{{ url_for('add_ticket') }}" method="post">
+            <input type="text" name="departure_city" placeholder="景点名称" required/>
+            <input type="text" name="departure_city" placeholder="城市" required/>
+            <input type="number" name="price" placeholder="价格" required/>
+            <input type="number" name="price" placeholder="评分" required/>
+            <input type="number" step="0.1" name="rating" placeholder="景点公司ID" required/>
+        </form>
+        
+        <h4>2、修改景点信息</h4>
+        <form action="{{ url_for('add_ticket') }}" method="post">
+            <input type="text" name="departure_city" placeholder="景点ID" required/>
+            <input type="text" name="departure_city" placeholder="景点名称" required/>
+            <input type="text" name="departure_city" placeholder="城市" required/>
+            <input type="number" name="price" placeholder="价格" required/>
+            <input type="number" name="price" placeholder="评分" required/>
+            <input type="number" step="0.1" name="rating" placeholder="景点公司ID" required/>
+        </form>
+
+        <h4>3、删除景点信息</h4>
+        <form action="{{ url_for('delete_ticket') }}" method="post">
+            <input type="number" name="ticket_id" placeholder="景点ID" required/>
+            <button type="submit" class="btn">删除景点<span></span><span></span><span></span><span></span></button>
+        </form>
+
+        <h4>景点信息</h4>
+        <table border="1">
+            <tr>
+                <th>景点ID</th>
+                <th>景点名称</th>
+                <th>城市</th>
+                <th>价格</th>
+                <th>评分</th>
+                <th>景点公司ID</th>
+            </tr>
+            {% for attraction in attractions %}
+            <tr>
+                <td>{{ attraction[0] }}</td>
+                <td>{{ attraction[1] }}</td>
+                <td>{{ attraction[2] }}</td>
+                <td>{{ attraction[3] }}</td>
+                <td>{{ attraction[4] }}</td>
+                <td>{{ attraction[5] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        
+        <div style="margin-top:50px; width:100%; color:grey; border: 0;border-top: 2px solid #d0d0d5;"></div>
+
+    </div>
+
+    <script>
+        // Function to display flash messages
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(message) {
+                message.style.display = 'block'; // Show the message
+
+                // Hide after 3 seconds
+                setTimeout(function() {
+                    message.style.display = 'none';
+                }, 1000);
+            });
+        });
+    </script>
+
+    <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="js/jquery.SuperSlide.js"></script>
+    <script>
+        function back_to_home() {
+            window.location.href = "/login";
+        }
+      </script>
 </body>
 </html>
