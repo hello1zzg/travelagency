@@ -1,0 +1,724 @@
+#数据流
+##login&submit
+get {userId, loanEXP}
+output {"userId":userId, "loanEXP":loanEXP}    loanEXP:期望贷款金额
+
+##bank_query
+input {"userId":"init.userId"}
+output {
+        "bank":[
+            {"bankId":0, "d_rate":d_rate0, "b_quota":b_quota0},     d_rate:对应银行的打折后利率, b_quota:对应银行的贷款额度
+            {"bankId":1, "d_rate":d_rate1, "b_quota":b_quota1},
+            {"bankId":2, "d_rate":d_rate2, "b_quota":b_quota2}
+        ],
+        "salary":salary
+        }
+
+##fund_query
+input {"userId":"init.userId"}
+output {"f_rate":f_rate, "f_quota":f_quota}
+
+##loan_rec
+input {
+        "userId":"init.userId",
+        "loanEXP":"init.loanEXP", 
+        "f_rate":"fund_query.f_rate", 
+        "f_quota":"fund_query.f_quota",
+        "bankId":"bank_query.bank.bankId",
+        "d_rate":"bank_query.bank.d_rate",
+        "b_quota":"bank_query.bank.b_quota",
+        "salary":"bank_query.salary"
+        }
+output {
+        "userId":userId,
+        "loan_type":loan_type,      推荐时默认计算等额本息
+        "bank":{
+            "bankId":bankId,
+            "b_amount":b_amount,      b_amount:在银行贷款的金额
+            "d_rate":d_rate
+        },
+        "fund":{
+            "f_amount":f_amount,
+            "f_rate":f_rate
+        }，
+        "term":term,
+        "monthly_pay":monthly_pay,
+        "total_pay":total_pay，
+        "f_quota":f_quota,
+        "b_quota":b_quota
+        }
+
+####################上阶段的service task数据到此终止，init数据刷新
+##submit_loan_plan
+get {loan_rec的全部output}
+output {
+        "userId":userId,
+        "name":name,
+        "loan_type":loan_type,
+        "repay_type":repay_type,           repay_type:等额本息/等额本金
+        "term":term,
+        "f_rate":f_rate,
+        "f_amount":f_amount,
+        "f_interest":f_interest,
+        "f_total_pay":f_total_pay,
+        "f_monthly_pay":f_monthly_pay,     monthly_pay:等额本息则每期还款，等额本金则首期还款
+        "f_monthly_decrement":f_monthly_decrement,
+        "bankId":bankId,
+        "d_rate":d_rate,
+        "b_amount":b_amount,
+        "b_interest":b_interest,
+        "b_total_pay":b_total_pay,
+        "b_monthly_pay":b_monthly_pay,
+        "b_monthly_decrement":b_monthly_decrement
+        }
+
+##credit_query
+input {"userId":"init.userId"}
+output {"credit":credit, "loan_time": loan_time}
+
+
+##store_bank_loan
+input {
+        "credit":"credit_query.credit",
+        "userId":"init.userId",
+        "bankId":"init.bankId",
+        "loan_type":"init.loan_type",
+        "repay_type":"init.repay_type",
+        "term":"init.term",
+        "d_rate":"init.d_rate",
+        "b_amount":"init.b_amount",
+        "b_interest":"init.b_interest",
+        "b_total_pay":"init.b_total_pay",
+        "b_monthly_pay":"init.b_monthly_pay",
+        "b_monthly_decrement":"init.b_monthly_decrement",
+        "loan_time":"credit_query.loan_time"
+       }
+output {"credit":credit, "loan_time": loan_time}
+
+##store_fund_loan
+input {
+        "credit":"credit_query.credit",
+        "userId":"init.userId",
+        "loan_type":"init.loan_type",
+        "repay_type":"init.repay_type",
+        "term":"init.term",
+        "f_rate":"init.f_rate",
+        "f_amount":"init.f_amount",
+        "f_interest":"init.f_interest",
+        "f_total_pay":"init.f_total_pay",
+        "f_monthly_pay":"init.f_monthly_pay",
+        "f_monthly_decrement":"init.f_monthly_decrement",
+        "loan_time":"credit_query.loan_time"
+       }
+output {}     output为空，但需把input存数据库
+
+##bank_auto_judge
+input {
+        "userId":"init.userId",
+        "bankId":"init.bankId",
+        "b_amount":"init.b_amount",
+        "b_monthly_pay":"init.b_monthly_pay",
+        "credit":"store_bank_loan.credit",
+        "loan_time":"store_bank_loan.loan_time"
+      }
+output {"result": "ok", "loan_time": loan_time}
+
+##fund_auto_judge
+input {
+        "userId":"init.userId",
+        "f_amount":"init.f_amount",
+        "credit":"store_fund_loan.credit",
+        "loan_time":"store_fund_loan.loan_time"
+      }
+output {"result": "ok", "loan_time": loan_time}
+
+
+
+##bank_judge
+get {loan_time}        直接从数据库读还没审批的申请
+output {"b_judge_res":b_judge_res}     需把人工判断的结果存数据库
+
+##fund_judge
+get {loan_time}        直接从数据库读还没审批的申请
+output {"f_judge_res":f_judge_res}     需把人工判断的结果存数据库
+
+##loan_res_confirm
+get {b_judge_res, f_judge_res}
+
+
+
+数据流
+
+register
+
+input
+
+{
+  "company_name": "init.company_name",
+  "password": "init.password",
+  "company_type": "init.company_type"
+}
+
+output
+
+{
+  "status": "status"
+}
+
+user_register
+
+input
+
+{
+  "user_name": "init.user_name",
+  "password": "init.password",
+  "user_role": "init.user_role"
+}
+
+output
+
+{
+  "status": "status"
+}
+
+company_register
+
+input
+
+{
+  "company_name":"init.company_name",
+  "password":"init.password",
+  "company_type":"init.company_type"
+}
+
+output
+
+{
+  "status": "status"
+}
+
+companylogincheck
+
+input
+
+{
+  "company_name": "init.company_name"
+}
+
+output
+
+{
+  "companyId": "companyId",
+  "company_name": "company_name",
+  "password": "password",
+  "company_type": "company_type",
+  "loginStatus": "loginStatus"
+}
+
+userlogincheck
+
+input
+
+{
+  "user_name": "init.user_name"
+}
+
+output
+
+{
+  "user_id": "user_id",
+  "password": "password",
+  "company_type": "company_type",
+  "loginStatus": "loginStatus"
+}
+
+submit
+
+input
+
+{
+  "flight_price": "init.flightprice",
+  "hotel_price": "init.room_price",
+  "car_rental_price": "init.carprice",
+  "attraction_price": "init.attprice",
+  "user_id": "init.user_id",
+  "flight_id": "init.flight_id",
+  "hotel_id": "init.hotel_id",
+  "carrental_id": "init.carrental_id",
+  "attraction_id": "init.attraction_id"
+}
+
+output
+
+{
+  "status": "status"
+}
+
+query_CarRental_by_price
+
+input
+
+{
+  "rental_location": "init.arrival_city",
+  "return_location": "init.arrival_city",
+  "price": "init.carrentalprice",
+  "transmission_type": "init.transmission_type",
+  "car_type": "init.car_type"
+}
+
+output
+
+{
+  "carRentals": [
+    {
+      "carrental_id": carrental_id0,
+      "car_type": car_type0,
+      "transmissionType": transmissionType0,
+      "carType": carType0,
+      "company_id": company_id0,
+      "return_location": return_location0,
+      "price": price0,
+      "rating": rating0
+    },
+    {
+      "carrental_id": carrental_id1,
+      "car_type": car_type1,
+      "transmissionType": transmissionType1,
+      "carType": carType1,
+      "company_id": company_id1,
+      "return_location": return_location1,
+      "price": price1,
+      "rating": rating1
+    }
+  ]
+}
+
+query_Attractions_by_rating
+
+input
+
+{
+  "arrival_city": "init.arrival_city",
+  "rating": "init.attractionrating"
+}
+
+output
+
+{
+  "attractions": [
+    {
+      "attraction_id": attraction_id0,
+      "attraction_name": "attraction_name0",
+      "city": "city0",
+      "price": price0,
+      "rating": "rating0",
+      "company_id": company_id0
+    },
+    {
+      "attraction_id": attraction_id1,
+      "attraction_name": "attraction_name1",
+      "city": "city1",
+      "price": price1,
+      "rating": "rating1",
+      "company_id": company_id1
+    }
+  ]
+}
+
+query_FlightInfo_by_rating
+
+input
+
+{
+  "departure_city": "init.departure_city",
+  "arrival_city": "init.arrival_city",
+  "rating": "init.flightrating",
+  "departure_time": "init.departure_time"
+}
+
+output
+
+{
+  "flights": [
+    {
+      "flight_id": flight_id0,
+      "departure_city": "departure_city0",
+      "arrival_city": "arrival_city0"
+      "departure_time": "departure_time0"
+      "price": price0,
+      "rating": "rating0",
+      "company_id": company_id0
+    },
+    {
+      "flight_id": flight_id1,
+      "departure_city": "departure_city1",
+      "arrival_city": "arrival_city1",
+      "departure_time": "departure_time1"
+      "price": price1,
+      "rating": "rating1",
+      "company_id": company_id
+    }
+  ]
+}
+
+query_CarRental_by_rating
+
+input
+
+{
+  "rental_location": "init.arrival_city",
+  "return_location": "init.arrival_city",
+  "rating": "init.carrentalrating",
+  "transmission_type": "init.transmission_type",
+  "car_type": "init.car_type"
+}
+
+output
+
+{
+  "carRentals": [
+    {
+      "carrental_id": carrental_id0,
+      "car_type": car_type0,
+      "transmissionType": transmissionType0,
+      "carType": carType0,
+      "company_id": company_id0,
+      "return_location": return_location0,
+      "price": price0,
+      "rating": rating0
+    },
+    {
+      "carrental_id": carrental_id1,
+      "car_type": car_type1,
+      "transmissionType": transmissionType1,
+      "carType": carType1,
+      "company_id": company_id1,
+      "return_location": return_location1,
+      "price": price1,
+      "rating": rating1
+    }
+  ]
+}
+
+query_Hotel_by_rating
+
+input
+
+{
+  "arrival_city": "init.arrival_city",
+  "rating": "init.hotelrating"
+}
+
+output
+
+{
+  "hotels": [
+    {
+      "hotelId": 0,
+      "hotel_name": "hotel_name0",
+      "city":"city0",
+      "price": price0,
+      "rating": "rating0",
+      "company_id": company_id0
+    },
+    {
+      "hotelId": 1,
+      "hotel_name": "hotel_name1",
+      "city":"city1",
+      "price": price1,
+      "rating": "rating1",
+      "company_id": company_id1
+    }
+  ]
+}
+
+query_Attractions_by_price
+
+input
+
+{
+  "arrival_city": "init.arrival_city",
+  "price": "init.attractionprice"
+}
+
+output
+
+{
+  "attractions": [
+    {
+      "attraction_id": attraction_id0,
+      "attraction_name": "attraction_name0",
+      "city": "city0",
+      "price": price0,
+      "rating": "rating0",
+      "company_id": company_id0
+    },
+    {
+      "attraction_id": attraction_id1,
+      "attraction_name": "attraction_name1",
+      "city": "city1",
+      "price": price1,
+      "rating": "rating1",
+      "company_id": company_id1
+    }
+  ]
+}
+
+query_Hotel_by_price
+
+input
+
+{
+  "arrival_city": "init.arrival_city",
+  "price": "init.hotelprice"
+}
+
+output
+
+{
+  "hotels": [
+    {
+      "hotelId": 0,
+      "hotel_name": "hotel_name0",
+      "city":"city0",
+      "price": price0,
+      "rating": "rating0",
+      "company_id": company_id0
+    },
+    {
+      "hotelId": 1,
+      "hotel_name": "hotel_name1",
+      "city":"city1",
+      "price": price1,
+      "rating": "rating1",
+      "company_id": company_id1
+    }
+  ]
+}
+
+query_FlightInfo_by_price
+
+input
+
+{
+  "departure_city": "init.departure_city",
+  "arrival_city": "init.arrival_city",
+  "price": "init.flightprice",
+  "departure_time": "init.departure_time"
+}
+
+output
+
+{
+  "flights": [
+    {
+      "flight_id": flight_id0,
+      "departure_city": "departure_city0",
+      "arrival_city": "arrival_city0"
+      "departure_time": "departure_time0"
+      "price": price0,
+      "rating": "rating0",
+      "company_id": company_id0
+    },
+    {
+      "flight_id": flight_id1,
+      "departure_city": "departure_city1",
+      "arrival_city": "arrival_city1",
+      "departure_time": "departure_time1"
+      "price": price1,
+      "rating": "rating1",
+      "company_id": company_id
+    }
+  ]
+}
+
+add_ticket
+
+input
+
+{
+  "flight_id": "init.flight_id",
+  "departure_city": "init.departure_city",
+  "arrival_city": "init.arrival_city",
+  "departure_time": "init.departure_time",
+  "price": "init.price",
+  "rating": "init.rating",
+  "company_id": "init.company_id"
+}
+
+output
+
+{
+  "status": "status"
+}
+
+update_ticket
+
+input
+
+{
+  "flight_id": "init.flight_id",
+  "departure_city": "init.departure_city",
+  "arrival_city": "init.arrival_city",
+  "departure_time": "init.departure_time",
+  "price": "init.price",
+  "rating": "init.rating"
+}
+
+output
+
+{
+  "updateStatus": "updateStatus"
+}
+
+delete_ticket
+
+input
+
+{
+  "flight_id": "init.flight_id"
+}
+
+output
+
+{
+  "deleteStatus": "deleteStatus"
+}
+
+attrating
+
+input
+
+{
+  "preference": "init.preference"
+}
+
+output
+
+{
+  "attractionRating": "attractionRating"
+}
+
+flightrating
+
+input
+
+{
+  "flightInfo": "init.flightInfo"
+}
+
+output
+
+{
+  "flightRating": "flightRating"
+}
+
+carrating
+
+input
+
+{
+  "carInfo": "init.carInfo"
+}
+
+output
+
+{
+  "carRating": "carRating"
+}
+
+hotelrating
+
+input
+
+{
+  "hotelInfo": "init.hotelInfo"
+}
+
+output
+
+{
+  "hotelRating": "hotelRating"
+}
+
+attprice
+
+input
+
+{
+  "attractionPrice": "init.attractionPrice"
+}
+
+output
+
+{
+  "attractionPriceStatus": "attractionPriceStatus"
+}
+
+flightprice
+
+input
+
+{
+  "flightPrice": "init.flightPrice"
+}
+
+output
+
+{
+  "flightPriceStatus": "flightPriceStatus"
+}
+
+carprice
+
+input
+
+{
+  "carPrice": "init.carPrice"
+}
+
+output
+
+{
+  "carPriceStatus": "carPriceStatus"
+}
+
+hotelprice
+
+input
+
+{
+  "hotelPrice": "init.hotelPrice"
+}
+output
+
+{
+  "hotelPriceStatus": "hotelPriceStatus"
+}
+
+responseusercheck
+
+input
+
+{
+  "userCheckResponse": "responseData"
+}
+
+output
+
+{
+  "userCheckStatus": "userCheckStatus"
+}
+
+responsecompanycheck
+
+input
+
+{
+  "companyCheckResponse": "responseData"
+}
+
+output
+{
+  "companyCheckStatus": "companyCheckStatus"
+}

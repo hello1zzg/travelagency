@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>企业信息录入 - 租车公司</title>
+    <style>
+        :root {
+            /* COLORS */
+            --white: #ffffff;
+            --gray: #333333;
+            --blue: #0367a6;
+            --lightblue: #008997;
+
+            /* RADII */
+            --button-radius: 0.7rem;
+
+            /* SIZES */
+            --max-width: 700px;
+
+            font-size: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+                Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        }
+        body {
+            /* background-image: url('/static/background_submit.png'); */
+            background-image: url('/static/background_login.JPG');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: Arial, sans-serif;
+            margin: 70px 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .travel-form {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding-top: 50px;
+            padding-left: 60px;
+            padding-right: 60px;
+            padding-bottom: 60px;
+            width: 90%;
+            max-width: 900px;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        input {
+            /* max-width: 250px; */
+            width: 96%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 2px 2px 7px 0 rgb(0, 0, 0, 0.2);
+            outline: none;
+            color: dimgray;
+        }
+
+        input:invalid {
+            animation: justshake 0.3s forwards;
+            caret-color: lightblue;
+        }
+
+        @keyframes justshake {
+            25% {
+                transform: translateX(5px);
+            }
+
+            50% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+
+            100% {
+                transform: translateX-(5px);
+            }
+        }
+        
+        table thead, table tr {
+            border-top-width: 1px;
+            border-top-style: solid;
+            border-top-color: rgb(183, 202, 227);
+        }
+        table {
+            min-width: 400px;
+            text-align: center;
+            rules: "rows";
+            border-left: 0;
+            border-right: 0;
+            border-top-width: 1px;
+            border-top-color: rgb(183, 202, 227);
+            border-spacing: 1px;
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+            border-bottom-color: rgb(183, 202, 227);
+        }
+        table td, table th {
+            border: none;
+            padding: 5px 10px;
+            font-size: 14px;
+            font-family: Verdana;
+            color: rgb(95, 126, 186);
+        }
+        table tr:nth-child(even) {
+            background: rgb(221, 223, 237)
+        }
+        table tr:nth-child(odd) {
+            background: #FFF
+        }
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: transparent;
+            border-width: 0px;
+            outline: none;
+            width: 60px;
+            height: 60px;
+            border: none;
+            cursor: pointer;
+            z-index: 999;
+        }
+        img{
+            outline:none;
+        }
+        .back-button.active.focus,
+        .back-button.active:focus,.back-button.focus,
+        .back-button:active.focus,.back-button:active:focus,
+        .back-button:focus{ outline:none; }
+    </style>
+</head>
+<body>
+    <div class="travel-form">
+        <h1 style="text-align: center; color: var(--blue);">租车公司信息录入</h1>
+        
+        <div style="margin-left:auto; margin-right:auto; margin-top:5px; width:240px; color:grey; border: 0; border-top: 2px solid #d0d0d5;"></div>
+        
+        <h2> 租车公司： {{ users[0] }} </h1>
+
+        <h4> 1、添加租车公司 </h4>
+        <form id="travel-info-form" action="/submit_travel_info" method="post">
+            <div class="form-group">
+                <label for="departure-date">选择出行日期：</label>
+                <input type="date" id="departure-date" name="departure_date" required>
+            </div>
+            <div class="form-group">
+                <label for="departure-city">出发城市：</label>
+                <input type="text" id="departure-city" name="departure_city" required>
+            </div>
+            <div class="form-group">
+                <label for="arrival-city">到达城市：</label>
+                <input type="text" id="arrival-city" name="arrival_city" required>
+            </div>
+            <div class="form-group">
+                <label>是否需要租车：</label>
+                <select id="need-car" name="need_car" onchange="toggleCarOptions(this)">
+                    <option value="no">不需要</option>
+                    <option value="yes">需要</option>
+                </select>
+            </div>
+            <div id="car-options" class="hidden">
+                <div class="form-group">
+                    <label for="car-type">选择车型：</label>
+                    <select id="car-type" name="car_type">
+                        <option value="微型车">微型车</option>
+                        <option value="小型车">小型车</option>
+                        <option value="紧凑型车">紧凑型车</option>
+                        <option value="中型车">中型车</option>
+                        <option value="中大型车">中大型车</option>
+                        <option value="大型车">大型车</option>
+                        <option value="SUV">SUV</option>
+                        <option value="MPV">MPV</option>
+                        <option value="跑车">跑车</option>
+                        <option value="皮卡">皮卡</option>
+                        <option value="微面">微面</option>
+                        <option value="轻客">轻客</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="gear-type">挡位：</label>
+                    <select id="gear-type" name="gear_type">
+                        <option value="手动挡">手动挡</option>
+                        <option value="自动挡">自动挡</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="guide">是否需要导游陪同：</label>
+                <select id="guide" name="guide">
+                    <option value="full">全程陪同</option>
+                    <option value="partial">部分陪同</option>
+                    <option value="none">不需要陪同</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="preference">旅游偏好：</label>
+                <select id="preference" name="preference">
+                    <option value="rating">好评优先</option>
+                    <option value="price">低价优先</option>
+                </select>
+            </div>
+            <button type="submit" class="button">提交旅游信息</button>
+        </form>
+    
+        <div style="margin-left:auto; margin-right:auto; margin-top:40px; width:100%; color:grey; border: 0; border-top: 2px solid #d0d0d5;"></div>
+        
+        <h4>2、删除租车公司</h4>
+        <form id="travel-info-form" action="/delete_flight_info" method="post">
+            <div class="form-group" style="margin-top: 10px;">
+                <label for="flight_id">删除租车公司ID：</label>
+                <input type="text" id="flight_id" name="flight_id" required/>
+            </div>
+            <button type="submit" class="button" style="margin-top:15px;">删除租车公司</button>
+        </form>
+
+        <div style="margin-left:auto; margin-right:auto; margin-top:40px; width:100%; color:grey; border: 0; border-top: 2px solid #d0d0d5;"></div>
+        
+        <h4>3、更改租车信息</h4>
+        <form action="{{ url_for('add_ticket') }}" method="post">
+            <label for="departure-date">车辆ID：</label>
+            <input type="text" name="departure_city" placeholder="车辆ID" required/>
+            
+            <label style="margin-top: 12px;" for="departure-date">车辆型号：</label>
+            <input type="text" name="departure_city" placeholder="车辆型号" required/>
+            
+            <label style="margin-top: 12px;" for="departure-date">操作模式：</label>
+            <input type="text" name="departure_city" placeholder="操作模式" required/>
+            
+            <label style="margin-top: 12px;" for="departure-date">租车地</label>
+            <input type="number" name="price" placeholder="租车地" required/>
+            
+            <label style="margin-top: 12px;" for="departure-date">还车地</label>
+            <input type="number" name="price" placeholder="还车地" required/>
+            
+            <label style="margin-top: 12px;" for="departure-date">价格</label>
+            <input type="number" step="0.1" name="rating" placeholder="价格" required/>
+            
+            <label style="margin-top: 12px;" for="departure-date">评分</label>
+            <input type="number" step="0.1" name="rating" placeholder="评分" required/>
+            
+            <button type="submit" class="button" style="margin-top:15px;">修改租车信息</button></form>
+
+        <div style="margin-left:auto; margin-right:auto; margin-top:40px; width:100%; color:grey; border: 0; border-top: 2px solid #d0d0d5;"></div>
+        
+        <h4>4、租车公司信息表</h4>
+        <table style="margin-top: 20px;" border="1">
+            <tr>
+                <th>车型</th>
+                <th>档位</th>
+                <th>租车地</th>
+                <th>还车地</th>
+                <th>价格</th>
+                <th>评分</th>
+                <th>租车公司ID</th>
+            </tr>
+            {% for rental in rentals %}
+            <tr>
+                <td>{{ rental[0] }}</td>
+                <td>{{ rental[1] }}</td>
+                <td>{{ rental[2] }}</td>
+                <td>{{ rental[3] }}</td>
+                <td>{{ rental[4] }}</td>
+                <td>{{ rental[5] }}</td>
+                <td>{{ rental[6] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+
+    <script>
+        function toggleCarOptions(select) {
+            var carOptions = document.getElementById('car-options');
+            if (select.value === 'yes') {
+                carOptions.classList.remove('hidden');
+            } else {
+                carOptions.classList.add('hidden');
+            }
+        }
+    </script>
+    <script>
+        function back_to_home() {
+            window.location.href = "/login";
+        }
+    </script>
+</body>
+</html>

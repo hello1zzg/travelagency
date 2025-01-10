@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    
+    <title>企业信息录入 - 酒店</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" 
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" 
+    crossorigin="anonymous" />
+    <!--<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}"> -->
+    <script type="text/javascript"
+        src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=9MgL2Bkngx2noZeiN58SkyLogOtguazU">
+    </script>
+    <style>
+        /* 额外样式用于显示闪现消息 */
+        :root {
+            /* COLORS */
+            --white: #ffffff;
+            --gray: #333333;
+            --blue: #0367a6;
+            --lightblue: #008997;
+
+            /* RADII */
+            --button-radius: 0.7rem;
+
+            /* SIZES */
+            --max-width: 700px;
+
+            font-size: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+                Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        }
+
+        .flash-message-container {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			z-index: 9999;
+			width: 80%;
+			max-width: 500px;
+        }
+
+        .alert {
+			width: 100%;
+			margin-bottom: 1rem;
+			text-align: center;
+        }
+
+        body {
+            /* background-image: url('/static/background_submit.png'); */
+            background-image: url('/static/background_login.JPG');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: Arial, sans-serif;
+            margin: 70px 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* height: 260vh; */
+            /* padding-top: 100px;
+            padding-bottom: 100px; */
+        }
+        .travel-form {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding-top: 50px;
+            padding-left: 60px;
+            padding-right: 60px;
+            padding-bottom: 60px;
+            width: 90%;
+            max-width: 900px;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        /* input {
+            width: 96%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        } */
+        .button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .hidden {
+            display: none;
+        }
+        
+        /* .input {
+          background-color: #fff;
+          border: none;
+          padding: 0.9rem 0.9rem;
+          margin: 0.5rem 0;
+          width: 100%;
+        } */
+
+        input {
+            /* max-width: 250px; */
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 2px 2px 7px 0 rgb(0, 0, 0, 0.2);
+            outline: none;
+            color: dimgray;
+        }
+
+        input:invalid {
+            animation: justshake 0.3s forwards;
+            caret-color: lightblue;
+        }
+
+        @keyframes justshake {
+            25% {
+                transform: translateX(5px);
+            }
+
+            50% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+
+            100% {
+                transform: translateX-(5px);
+            }
+        }
+        #container {padding: 10px;
+            margin:auto;
+            height: 400px;
+            width: 600px;
+        }
+        
+        table thead, table tr {
+            border-top-width: 1px;
+            border-top-style: solid;
+            border-top-color: rgb(183, 202, 227);
+        }
+        table {
+            min-width: 400px;
+            text-align: center;
+            rules: "rows";
+            border-left: 0;
+            border-right: 0;
+            border-top-width: 1px;
+            border-top-color: rgb(183, 202, 227);
+            border-spacing: 1px;
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+            border-bottom-color: rgb(183, 202, 227);
+        }
+        /* Padding and font style */
+        table td, table th {
+            border: none;
+            padding: 5px 10px;
+            font-size: 14px;
+            font-family: Verdana;
+            color: rgb(95, 126, 186);
+        }
+        /* Alternating background colors */
+        table tr:nth-child(even) {
+            background: rgb(221, 223, 237)
+        }
+        table tr:nth-child(odd) {
+            background: #FFF
+        }
+
+        h3 {
+            margin-top: 30px;
+        }
+        h4 {
+            margin-top: 30px;
+        }
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: transparent;
+            border-width: 0px;
+            outline: none;
+            width: 60px;
+            height: 60px;
+            border: none;
+            cursor: pointer;
+            z-index: 999;
+        }
+        img{
+            outline:none;
+        }
+    </style>
+</head>
+<body>
+    <!-- <button class="back-button" onclick="back_to_home()">
+        <img src="/static/back.png" alt="back">
+    </button> -->
+    <div class="flash-message-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category == "success" %}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% elif category == "warning" %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% else %}
+                        <!-- 其它默认为错误提示，或可根据需要自行分类 -->
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 等页面完全加载后再执行
+            setTimeout(function(){
+                // 选中所有具有 .alert 类的元素
+                const alerts = document.querySelectorAll('.alert');
+                // 遍历并移除它们
+                alerts.forEach(function(alert) {
+                    alert.remove();
+                });
+            }, 1000); // 3秒后自动执行
+        });
+        </script>
+
+    <div class="travel-form">
+        <h1 style="text-align: center; color: var(--blue);">酒店信息录入</h1>
+
+        <div style="margin-left:auto; margin-right:auto; margin-top:5px; width:180px; color:grey; border: 0; border-top: 2px solid #d0d0d5;"></div>
+
+        <h3> 酒店名称： {{ users[0] }} </h3>
+        <h4> 1、酒店信息添加 </h4>
+        <form id="travel-info-form" action="/submit_Hotel_info" method="post">
+            <div class="form-group">
+                <label for="hotel_name">酒店名：</label>
+                <input type="text" id="hotel_name" name="hotel_name" required/>
+            </div>
+            <div class="form-group">
+                <label for="city">酒店所在城市：</label>
+                <input type="text" id="city" name="city" required/>
+            </div>
+            <div id="container"></div>
+            <button type="submit" class="button" style="margin-top: 15px;">提交酒店信息</button>
+        </form>
+
+        <div style="margin-left:auto; margin-right:auto; margin-top:40px; width: 100%; color:grey; border: 0; border-top: 2px solid #d0d0d5;"></div>
+        
+        <h4>2、酒店删除</h4>
+        <form id="travel-info-form" action="/delete_hotel_info" method="post">
+            <div class="form-group" style="margin-top: 10px;">
+                <label for="hotel_id">删除酒店ID：</label>
+                <input type="text" id="hotel_id" name="hotel_id" required/>
+            </div>
+            <button type="submit" class="button" style="margin-top:15px;">删除酒店</button>
+        </form>
+
+        <div style="margin-left:auto; margin-right:auto; margin-top:40px; width: 100%; color:grey; border: 0; border-top: 2px solid #d0d0d5;"></div>
+        
+        <h4>3、酒店修改</h4>
+        <form id="travel-info-form" action="/delete_hotel_info" method="post">
+            <div class="form-group" style="margin-top: 10px;">
+                <label for="hotel_id">修改酒店ID：</label>
+                <input style="width: 28%;"  type="text" name="hotel_id" placeholder="酒店ID" required/>
+                <input style="width: 28%; margin-left: 2%;" type="text" name="company_id" placeholder="公司ID" required/>
+                <input style="width: 28%; margin-left: 2%;" type="text" name="hotel_name" placeholder="酒店名" required/>
+                <input style="width: 28%; margin-top: 10px;" type="text" name="city" placeholder="城市" required/>
+                <input style="width: 28%; margin-top: 10px; margin-left: 2%;" type="number" step="0.1" name="rating" placeholder="评分" required/>
+            </div>
+            <button type="submit" class="button" style="margin-top:15px;">修改酒店</button>
+        </form>
+
+        <div style="margin-left:auto; margin-right:auto; margin-top:40px; width: 100%; color:grey; border: 0; border-top: 2px solid #d0d0d5;"></div>
+        
+        <h4>4、酒店信息表</h4>
+        <table style="margin-top: 20px;" border="1">
+            <tr>
+                <th>酒店ID</th>
+                <th>酒店名</th>
+                <th>城市</th>
+                <th>评分</th>
+            </tr>
+            {% for hotel in hotels %}
+            <tr>
+                <td>{{ hotel[0] }}</td>
+                <td>{{ hotel[1] }}</td>
+                <td>{{ hotel[2] }}</td>
+                <td>{{ hotel[3] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=maps&v=beta"
+      defer
+    ></script> -->
+    <script>
+        var map = new BMapGL.Map("container");// 创建地图实例 
+        var point = new BMapGL.Point(116.404, 39.915);// 创建点坐标 
+        map.centerAndZoom(point, 15);// 初始化地图，设置中心点坐标和地图级别 
+        map.enableScrollWheelZoom(true); //滚轮缩放
+        var scaleCtrl = new BMapGL.ScaleControl(); // 添加比例尺控件
+        map.addControl(scaleCtrl);
+        var zoomCtrl = new BMapGL.ZoomControl(); // 添加缩放控件
+        map.addControl(zoomCtrl);
+        var cityCtrl = new BMapGL.CityListControl(); // 添加城市列表控件
+        map.addControl(cityCtrl);
+    </script>
+    <script>
+        function toggleCarOptions(select) {
+            var carOptions = document.getElementById('car-options');
+            if (select.value === 'yes') {
+                carOptions.classList.remove('hidden');
+            } else {
+                carOptions.classList.add('hidden');
+            }
+        }
+    </script>
+    <script>
+        function back_to_home() {
+            window.location.href = "/login";
+        }
+    </script>
+</body>
+</html>
